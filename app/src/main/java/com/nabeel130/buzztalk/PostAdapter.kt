@@ -1,21 +1,25 @@
 package com.nabeel130.buzztalk
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.nabeel130.buzztalk.models.Post
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-class PostAdapter(options: FirestoreRecyclerOptions<Post>):
+class PostAdapter(options: FirestoreRecyclerOptions<Post>,val listener: IPostAdapter):
     FirestoreRecyclerAdapter<Post, PostAdapter.PostViewHolder>(options) {
 
     class PostViewHolder(view: View): RecyclerView.ViewHolder(view) {
@@ -28,7 +32,19 @@ class PostAdapter(options: FirestoreRecyclerOptions<Post>):
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
-        return PostViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_item,parent,false))
+        val viewHolder =  PostViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_item,parent,false))
+        viewHolder.likeBtn.setOnClickListener {
+            listener.onPostLiked(snapshots.getSnapshot(viewHolder.adapterPosition).id)
+//            if(viewHolder.likeBtn.drawable.current == ContextCompat.getDrawable(viewHolder.likeBtn.context,R.drawable.ic_baseline_favorite_border_24)){
+//                Log.d("PostReport","in if block")
+//            //viewHolder.likeBtn.setImageDrawable(ContextCompat.getDrawable(viewHolder.likeBtn.context,R.drawable.ic_baseline_favorite_24))
+//            }
+//            else{
+//                Log.d("PostReport","in else block")
+//                //viewHolder.likeBtn.setImageDrawable(ContextCompat.getDrawable(viewHolder.likeBtn.context,R.drawable.ic_baseline_favorite_border_24))
+//            }
+        }
+        return viewHolder
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -42,5 +58,19 @@ class PostAdapter(options: FirestoreRecyclerOptions<Post>):
         calendar.timeInMillis = model.createdAt
         holder.createdAt.text = dateFormat.format(calendar.time)
         Glide.with(holder.userImage.context).load(model.createdBy.imageUrl).circleCrop().into(holder.userImage)
+
+        val auth = Firebase.auth
+        val uid = auth.currentUser!!.uid
+        val isLiked = model.likedBy.contains(uid)
+
+        if(isLiked){
+            holder.likeBtn.setImageDrawable(ContextCompat.getDrawable(holder.likeBtn.context,R.drawable.ic_baseline_favorite_24))
+        }else{
+            holder.likeBtn.setImageDrawable(ContextCompat.getDrawable(holder.likeBtn.context,R.drawable.ic_baseline_favorite_border_24))
+        }
     }
+}
+
+interface IPostAdapter{
+    fun onPostLiked(postId: String)
 }

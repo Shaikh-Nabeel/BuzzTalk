@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "270364308072",
+    "project_id": "buzztalk-328821",
+    "storage_bucket": "buzztalk-328821.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:270364308072:android:4c9527c73224598ccbc1dd",
+        "android_client_info": {
+          "package_name": "com.nabeel130.buzztalk"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "270364308072-iu33c0iopbk37ve5nca3mte5o727vm4k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nabeel130.buzztalk",
+            "certificate_hash": "9091fe672b7ca4d45af616628c877ecd7e4d8a72"
+          }
+        },
+        {
+          "client_id": "270364308072-f87u344doh6a96otasu8n8o5grcjmk7i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_bVruQMYmWfOThXRAIMY0Ep2VmNAGspg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "270364308072-f87u344doh6a96otasu8n8o5grcjmk7i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

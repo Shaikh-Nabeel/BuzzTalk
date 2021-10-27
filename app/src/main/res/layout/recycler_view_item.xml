@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/border_for_post_text"
+        android:padding="10dp"
+        android:layout_margin="5dp"
+        >
+        <ImageView
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:background="@color/black"
+            android:id="@+id/profilePic"
+            android:layout_margin="5dp"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:id="@+id/userName"
+            app:layout_constraintStart_toEndOf="@+id/profilePic"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            app:layout_constraintTop_toTopOf="parent"
+            android:textSize="16sp"
+            tools:text="ramesh gutka"
+            />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/createdAt"
+            app:layout_constraintTop_toBottomOf="@+id/userName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/profilePic"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="3dp"
+            android:textSize="12sp"
+            tools:text="12-12-2001 22:33 am"
+            />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:id="@+id/postContent"
+            app:layout_constraintTop_toBottomOf="@+id/profilePic"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_margin="8dp"
+            android:textSize="16sp"
+            android:background="#F8F6F6"
+            android:singleLine="false"
+            android:padding="5dp"
+            tools:text="hey, there it is my first post"
+            />
+
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            app:layout_constraintTop_toBottomOf="@+id/postContent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:contentDescription="@string/app_name"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:id="@+id/likeBtn"
+            android:background="@drawable/ic_baseline_favorite_border_24"
+            />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:id="@+id/likeCount"
+            app:layout_constraintTop_toBottomOf="@+id/postContent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/likeBtn"
+            android:layout_margin="8dp"
+            android:textSize="13sp"
+            android:padding="5dp"
+            tools:text="23"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">BuzzTalk</string>
+    <string name="post">POST</string>
+    <string name="post_hint">Share your thoughts</string>
 </resources>

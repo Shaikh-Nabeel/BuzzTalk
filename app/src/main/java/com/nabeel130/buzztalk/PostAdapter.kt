@@ -44,6 +44,9 @@ class PostAdapter(options: FirestoreRecyclerOptions<Post>,val listener: IPostAda
 //                //viewHolder.likeBtn.setImageDrawable(ContextCompat.getDrawable(viewHolder.likeBtn.context,R.drawable.ic_baseline_favorite_border_24))
 //            }
         }
+        viewHolder.likeCount.setOnClickListener {
+            listener.onLikeCountClicked(snapshots.getSnapshot(viewHolder.adapterPosition).id)
+        }
         return viewHolder
     }
 
@@ -73,4 +76,5 @@ class PostAdapter(options: FirestoreRecyclerOptions<Post>,val listener: IPostAda
 
 interface IPostAdapter{
     fun onPostLiked(postId: String)
+    fun onLikeCountClicked(postId: String)
 }

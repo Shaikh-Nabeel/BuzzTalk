@@ -2,4 +2,7 @@
     <string name="app_name">BuzzTalk</string>
     <string name="post">POST</string>
     <string name="post_hint">Share your thoughts</string>
+    <string name="buzz">Buzz</string>
+    <string name="talk">Talk</string>
+    <string name="likes">Likes</string>
 </resources>

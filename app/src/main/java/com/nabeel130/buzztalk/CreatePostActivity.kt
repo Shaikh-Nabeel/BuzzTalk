@@ -1,5 +1,6 @@
 package com.nabeel130.buzztalk
 
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.nabeel130.buzztalk.daos.PostDao
@@ -17,6 +18,9 @@ class CreatePostActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityCreatePostBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        binding.customToolB2.title = getString(R.string.app_name)
+        binding.customToolB2.setTitleTextColor(Color.WHITE)
 
         val postDao = PostDao()
 

@@ -5,4 +5,14 @@
     <string name="buzz">Buzz</string>
     <string name="talk">Talk</string>
     <string name="likes">Likes</string>
+    <string name="more_btn">more_btn</string>
+    <string name="delete">Delete</string>
+    <string name="share">Share</string>
+    <string name="profile">Profile</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="logout">Logout</string>
+    <string name="sharing">Sharing</string>
+    <string name="app_activity">App Activity</string>
+    <string name="navigation_close">Open Navigation drawer</string>
+    <string name="navigation_open">Close Navigation drawer</string>
 </resources>

@@ -3,6 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/border_for_post_text"
+    android:layout_margin="1dp"
     android:padding="16dp">
 
     <ImageView
@@ -25,7 +27,8 @@
         android:textColor="@color/white"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        tools:text="Ramesh Gutka pan prag"
-        />
+        android:paddingStart="5dp"
+        tools:text="remesh gutka"
+        tools:ignore="RtlSymmetry" />
 
 </RelativeLayout>

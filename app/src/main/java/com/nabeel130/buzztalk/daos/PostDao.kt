@@ -39,6 +39,10 @@ class PostDao {
         }
     }
 
+    fun deletePost(uid: String): Task<Void>{
+        return postCollection.document(uid).delete()
+    }
+
     fun getPostById(uid: String): Task<DocumentSnapshot> {
         return postCollection.document(uid).get()
     }

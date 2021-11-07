@@ -15,4 +15,9 @@
     <string name="app_activity">App Activity</string>
     <string name="navigation_close">Open Navigation drawer</string>
     <string name="navigation_open">Close Navigation drawer</string>
+    <string name="areYouSure">Are you sure?</string>
+    <string name="dont_delete">Don\'t Delete</string>
+    <string name="dialog_text_1">This action cannot be undone!</string>
+    <string name="dialog_text_2">Logout of BuzzTalk?</string>
+    <string name="privacy_policy_link">https://nabsportfolio.000webhostapp.com/PrivacyPolicy.html</string>
 </resources>

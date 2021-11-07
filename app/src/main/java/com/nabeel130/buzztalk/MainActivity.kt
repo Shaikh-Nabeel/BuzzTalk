@@ -1,66 +1,83 @@
 package com.nabeel130.buzztalk
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
+import android.view.animation.Animation
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.core.content.ContextCompat
-import androidx.core.view.get
-import androidx.core.view.iterator
-import androidx.core.view.size
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.Query
 import com.google.firebase.ktx.Firebase
 import com.nabeel130.buzztalk.daos.PostDao
 import com.nabeel130.buzztalk.daos.UserDao
+import com.nabeel130.buzztalk.daos.UserPostDao
 import com.nabeel130.buzztalk.databinding.ActivityMainBinding
+import com.nabeel130.buzztalk.fragments.ProfileFragment
 import com.nabeel130.buzztalk.models.Post
 import com.nabeel130.buzztalk.models.User
+import com.nabeel130.buzztalk.models.UserPost
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
-class MainActivity : AppCompatActivity(), IPostAdapter {
+class MainActivity : AppCompatActivity(), IPostAdapter,
+    NavigationView.OnNavigationItemSelectedListener {
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: PostAdapter
     private lateinit var postDao: PostDao
     private lateinit var userDao: UserDao
     private lateinit var likeAdapter: LikeAdapter
+    private lateinit var toggle: ActionBarDrawerToggle
+    private val TAG = "BuzzReport"
+
+    companion object{
+        private var instance: MainActivity? = null
+
+        fun getInstance(): MainActivity{
+            return instance ?: MainActivity().apply {
+                instance = this
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        instance = this
         binding.customToolB.title = getString(R.string.app_name)
         binding.customToolB.setTitleTextColor(Color.WHITE)
         setSupportActionBar(binding.customToolB)
+        binding.navigationView.bringToFront()
 
-        userDao = UserDao()
-
-
-        val toggle = ActionBarDrawerToggle(this,binding.drawableLayout,binding.customToolB,R.string.navigation_open,R.string.navigation_close)
+        toggle = ActionBarDrawerToggle(this,binding.drawableLayout,binding.customToolB,R.string.navigation_open,R.string.navigation_close)
         binding.drawableLayout.addDrawerListener(toggle)
         toggle.syncState()
+        binding.navigationView.setNavigationItemSelectedListener(this)
 
         val view = binding.navigationView.getHeaderView(0)
         val profile: ImageView = view.findViewById(R.id.profilePicForMenuBar)
         val userName: TextView = view.findViewById(R.id.userNameForMenuBar)
 
+        userDao = UserDao()
         GlobalScope.launch(Dispatchers.IO){
             val userId = Firebase.auth.currentUser?.uid!!
             userDao.getUserById(userId).addOnCompleteListener {
@@ -74,51 +91,14 @@ class MainActivity : AppCompatActivity(), IPostAdapter {
             }
         }
 
-        createMenu()
-
         binding.createPostBtn.setOnClickListener {
             startActivity(Intent(this,CreatePostActivity::class.java))
+            overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out)
         }
+
         loadAllPost()
     }
 
-    private fun createMenu(){
-        binding.navigationView.setNavigationItemSelectedListener {
-            val id = it.itemId
-            Log.d("BuzzReport", "reachingg....")
-            when (id) {
-                R.id.profileDetails -> {
-                    Log.d("BuzzReport", "profileDetails")
-                }
-                R.id.privacyPolicy -> {
-                    Log.d("BuzzReport", "privacy policy")
-                }
-                R.id.logOutBtn -> {
-                    signOut()
-                }
-                R.id.shareApp -> {
-                    Log.d("BuzzReport", "Share")
-                }
-            }
-            true
-        }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-
-        if(id == R.id.profileDetails){
-            Toast.makeText(applicationContext,
-            "Clickedd",
-            Toast.LENGTH_SHORT).show()
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
-
-    fun signOut(){
-
-    }
 
     private fun loadAllPost() {
         postDao = PostDao()
@@ -140,22 +120,30 @@ class MainActivity : AppCompatActivity(), IPostAdapter {
         adapter.stopListening()
     }
 
+    fun visibleComponentOfMainActivity(){
+        binding.recyclerView.visibility = View.VISIBLE
+        binding.createPostBtn.visibility = View.VISIBLE
+    }
+
     override fun onPostLiked(postId: String) {
         postDao.likedPost(postId)
     }
 
     private var listOfLikedUser: ArrayList<String> = ArrayList()
 
-    //funtion to show name of user who have liked current post
+    //function to show name of user who have liked current post
     @SuppressLint("NotifyDataSetChanged")
     override fun onLikeCountClicked(postId: String) {
 
         binding.progressBarForLikes.visibility = View.VISIBLE
         binding.relativeLayoutForLikes.visibility = View.VISIBLE
         binding.recyclerView.visibility = View.GONE
+        binding.createPostBtn.visibility = View.GONE
+
         binding.closeBtnForLikes.setOnClickListener {
             binding.relativeLayoutForLikes.visibility = View.GONE
             binding.recyclerView.visibility = View.VISIBLE
+            binding.createPostBtn.visibility = View.VISIBLE
             listOfLikedUser.clear()
             likeAdapter.notifyDataSetChanged()
         }
@@ -173,19 +161,113 @@ class MainActivity : AppCompatActivity(), IPostAdapter {
     }
 
     override fun onDeletePostClicked(postId: String) {
-        postDao.deletePost(postId).addOnCompleteListener {
-            if(it.isSuccessful)
-                Toast.makeText(applicationContext,"Deleted",Toast.LENGTH_SHORT).show()
-            else
-                Toast.makeText(applicationContext,"Couldn't delete",Toast.LENGTH_SHORT).show()
-            Log.d("BuzzReport","Post deleted status: "+it.exception?.message)
+
+        val dialog = buildDialogBox(getString(R.string.areYouSure),getString(R.string.dialog_text_1))
+        val confirmBtn: Button = dialog.findViewById(R.id.confirm_button)
+        val denyBtn: Button = dialog.findViewById(R.id.deny_button)
+
+        confirmBtn.setOnClickListener {
+            dialog.dismiss()
+            postDao.deletePost(postId).addOnCompleteListener {
+                if (it.isSuccessful)
+                    Toast.makeText(applicationContext, "Deleted", Toast.LENGTH_SHORT).show()
+                else
+                    Toast.makeText(applicationContext, "Couldn't delete", Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "Post deleted status: " + it.exception?.message)
+            }
         }
+
+        denyBtn.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     override fun onShareClicked(text: String, userName: String) {
         val intent = Intent(Intent.ACTION_SEND).setType("text/plain")
+        intent.putExtra(Intent.EXTRA_SUBJECT,"BuzzTalk")
         intent.putExtra(Intent.EXTRA_TEXT, text)
         startActivity(Intent.createChooser(intent,"Post from $userName"))
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.profileDetails -> {
+                val profileFragment = ProfileFragment()
+                binding.recyclerView.visibility = View.GONE
+                binding.createPostBtn.visibility = View.GONE
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.frameLayoutForFragments,profileFragment)
+                    addToBackStack(null)
+                    commit()
+                }
+                binding.drawableLayout.closeDrawer(binding.navigationView)
+                true
+            }
+            R.id.privacyPolicy -> {
+                val builder = CustomTabsIntent.Builder().build()
+                builder.launchUrl(this, Uri.parse(getString(R.string.privacy_policy_link)))
+                binding.drawableLayout.closeDrawer(binding.navigationView)
+                true
+            }
+            R.id.logOutBtn -> {
+                singOut()
+                binding.drawableLayout.closeDrawer(binding.navigationView)
+                true
+            }
+            R.id.shareApp -> {
+                Toast.makeText(applicationContext,"Coming soon",Toast.LENGTH_SHORT).show()
+                true
+            }
+            else -> false
+        }
+    }
+
+    private val authStateListener = FirebaseAuth.AuthStateListener{
+        if(it.currentUser ==  null){
+            val intent = Intent(this,SignInActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            startActivity(intent)
+            finish()
+        }
+    }
+
+    private fun buildDialogBox(title: String,subTitle: String): Dialog{
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setContentView(R.layout.custom_dialog_box)
+        dialog.setCancelable(false)
+        dialog.window?.attributes?.windowAnimations = R.style.PauseDialogAnimation
+
+        val confirmText = dialog.findViewById<TextView>(R.id.txtAreYouSure)
+        val aboutAction = dialog.findViewById<TextView>(R.id.txtForDeleteDialog)
+        confirmText.text = title
+        aboutAction.text = subTitle
+
+        return dialog
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun singOut() {
+        val dialog = buildDialogBox(getString(R.string.logout),getString(R.string.dialog_text_2))
+
+        val confirmBtn: Button = dialog.findViewById(R.id.confirm_button)
+        val denyBtn: Button = dialog.findViewById(R.id.deny_button)
+        confirmBtn.text = "Log Out"
+        denyBtn.text = "Cancel"
+
+        confirmBtn.setOnClickListener {
+            dialog.dismiss()
+            val firebaseAuth = FirebaseAuth.getInstance()
+            firebaseAuth.addAuthStateListener(authStateListener)
+            firebaseAuth.signOut()
+        }
+        denyBtn.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 
 }

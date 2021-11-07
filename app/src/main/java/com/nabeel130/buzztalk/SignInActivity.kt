@@ -84,6 +84,7 @@ class SignInActivity : AppCompatActivity() {
             startActivity(Intent(this,MainActivity::class.java))
             finish()
         }else{
+            googleSignInClient.signOut()
             binding.googleSignInBtn.visibility = View.VISIBLE
             binding.progressBarLogin.visibility = View.GONE
         }

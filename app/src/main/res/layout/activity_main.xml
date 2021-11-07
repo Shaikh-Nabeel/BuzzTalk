@@ -4,10 +4,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
     android:id="@+id/drawableLayout"
     android:fitsSystemWindows="true"
-    tools:openDrawer="left"
+    tools:context=".MainActivity"
+    tools:openDrawer="start"
     >
 
     <com.google.android.material.navigation.NavigationView
@@ -38,8 +38,18 @@
         android:background="?attr/colorPrimaryVariant"
         android:maxHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
-        app:navigationIcon="@color/white"
+        app:navigationIcon="@drawable/ic_baseline_person_24"
         />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/customToolB"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/frameLayoutForFragments"
+            />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -85,6 +95,7 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
             />
+
         <ProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -95,6 +106,7 @@
             android:indeterminate="true"
             android:indeterminateTint="@color/white"
             />
+
         <androidx.recyclerview.widget.RecyclerView
             android:layout_gravity="top"
             android:paddingTop="10dp"
@@ -104,7 +116,6 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
             android:id="@+id/recyclerViewForLike"
-            tools:listitem="@layout/likes_view_item"
             />
 
     </RelativeLayout>
@@ -120,18 +131,21 @@
         android:nestedScrollingEnabled="false"/>
 
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/createPostBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="30dp"
-        android:layout_marginBottom="30dp"
-        android:backgroundTint="@color/purple_500"
-        android:contentDescription="@string/app_name"
-        android:src="@drawable/ic_baseline_add_24"
-        app:tint="@color/white"/>
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/createPostBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="30dp"
+            android:layout_marginBottom="30dp"
+            android:backgroundTint="#494747"
+            android:contentDescription="@string/app_name"
+            android:text="@string/post"
+            android:textColor="@color/white"
+            app:icon="@drawable/ic_baseline_add_24"
+            app:iconTint="@color/white"
+            tools:ignore="TextContrastCheck" />
 
     </RelativeLayout>
 </androidx.drawerlayout.widget.DrawerLayout>

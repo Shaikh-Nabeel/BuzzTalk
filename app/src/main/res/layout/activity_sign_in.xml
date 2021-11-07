@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/sign_in_bg_image"
+    android:background="@drawable/sign_in_background"
     tools:context=".SignInActivity">
 
     <ProgressBar
@@ -34,29 +34,37 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/buzz"
+            android:fontFamily="sans-serif-medium"
             android:textColor="@color/white"
+            android:background="@drawable/left_corner"
             android:textSize="45sp"
             android:textStyle="bold"
-            />
+            android:gravity="end"
+            android:paddingStart="10dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            tools:ignore="RtlSymmetry" />
 
         <TextView
             android:id="@+id/talkTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/talk"
+            android:background="@drawable/right_corner"
             android:textColor="@color/purple_700"
+            android:fontFamily="sans-serif-medium"
             android:textSize="45sp"
             android:textStyle="bold"
-            />
+            android:paddingEnd="10dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            tools:ignore="RtlSymmetry" />
     </LinearLayout>
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/googleSignInBtn"
-        android:layout_width="match_parent"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:background="@color/purple_700"
-        android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -72,7 +72,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:background="#2B2A2A"
+            android:background="@drawable/post_text_background"
             android:padding="5dp"
             android:singleLine="false"
             android:textColor="@color/white"
@@ -82,14 +82,16 @@
             app:layout_constraintTop_toBottomOf="@+id/profilePic"
             tools:text="hey, there it is my first post" />
 
-        <ImageView
+        <ToggleButton
             android:id="@+id/likeBtn"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:background="@drawable/ic_baseline_favorite_border_24"
-            android:contentDescription="@string/app_name"
+            android:text="@string/space"
+            android:textOff=""
+            android:textOn=""
+            android:background="@drawable/like_toggle_selector"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/postContent" />
 
@@ -100,7 +102,6 @@
             android:layout_marginStart="15dp"
             android:layout_marginTop="8dp"
             android:fontFamily="sans-serif-black"
-            android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:padding="5dp"
             android:textColor="@color/white"

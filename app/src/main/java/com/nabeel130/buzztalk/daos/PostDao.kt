@@ -13,6 +13,7 @@ import com.nabeel130.buzztalk.models.UserPost
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class PostDao {
 
@@ -85,22 +86,20 @@ class PostDao {
         return postCollection.document(uid).get()
     }
 
-    fun likedPost(postId: String) {
-        GlobalScope.launch(Dispatchers.IO){
-            val uid = auth.currentUser?.uid!!
-            getPostById(postId).addOnCompleteListener {
-                if(it.isSuccessful){
-                    val post = it.result.toObject(Post::class.java)!!
-                    val isLiked = post.likedBy.contains(uid)
+    fun likedPost(postId: String): Task<DocumentSnapshot> {
+        val uid = auth.currentUser?.uid!!
 
-                    if(isLiked)
-                        post.likedBy.remove(uid)
-                    else
-                        post.likedBy.add(uid)
+        return getPostById(postId).addOnSuccessListener {
+            val post = it.toObject(Post::class.java)!!
+            val isLiked = post.likedBy.contains(uid)
 
-                    postCollection.document(postId).set(post)
-                }
-            }
+            if (isLiked)
+                post.likedBy.remove(uid)
+            else
+                post.likedBy.add(uid)
+            postCollection.document(postId).set(post)
+        }.addOnFailureListener {
+            it.printStackTrace()
         }
     }
 }

@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.view.animation.Animation
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -27,15 +26,11 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.ktx.Firebase
 import com.nabeel130.buzztalk.daos.PostDao
 import com.nabeel130.buzztalk.daos.UserDao
-import com.nabeel130.buzztalk.daos.UserPostDao
 import com.nabeel130.buzztalk.databinding.ActivityMainBinding
 import com.nabeel130.buzztalk.fragments.ProfileFragment
 import com.nabeel130.buzztalk.models.Post
 import com.nabeel130.buzztalk.models.User
-import com.nabeel130.buzztalk.models.UserPost
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity(), IPostAdapter,
     NavigationView.OnNavigationItemSelectedListener {
@@ -46,6 +41,7 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
     private lateinit var likeAdapter: LikeAdapter
     private lateinit var toggle: ActionBarDrawerToggle
     private val TAG = "BuzzReport"
+
 
     companion object{
         private var instance: MainActivity? = null
@@ -126,7 +122,9 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
     }
 
     override fun onPostLiked(postId: String) {
-        postDao.likedPost(postId)
+        GlobalScope.launch(Dispatchers.IO) {
+            postDao.likedPost(postId)
+        }
     }
 
     private var listOfLikedUser: ArrayList<String> = ArrayList()
@@ -199,6 +197,7 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
                 binding.createPostBtn.visibility = View.GONE
                 supportFragmentManager.beginTransaction().apply {
                     replace(R.id.frameLayoutForFragments,profileFragment)
+//                    replace(R.id.frameLayoutForFragments,profileFragment)
                     addToBackStack(null)
                     commit()
                 }

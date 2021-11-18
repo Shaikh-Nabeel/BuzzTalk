@@ -20,4 +20,7 @@
     <string name="dialog_text_1">This action cannot be undone!</string>
     <string name="dialog_text_2">Logout of BuzzTalk?</string>
     <string name="privacy_policy_link">https://nabsportfolio.000webhostapp.com/PrivacyPolicy.html</string>
+    <string name="space" />
+    <string name="_0_post">0\nPost</string>
+    <string name="username">username</string>
 </resources>

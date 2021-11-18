@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
-import androidx.core.content.ContextCompat
+import android.widget.ToggleButton
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
@@ -20,9 +20,7 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-val user = Firebase.auth.currentUser?.uid
-val auth = Firebase.auth
-val uid = auth.currentUser!!.uid
+val user = Firebase.auth.currentUser!!.uid
 
 class PostAdapter(options: FirestoreRecyclerOptions<Post>, private val listener: IPostAdapter):
     FirestoreRecyclerAdapter<Post, PostAdapter.PostViewHolder>(options) {
@@ -33,7 +31,7 @@ class PostAdapter(options: FirestoreRecyclerOptions<Post>, private val listener:
         val createdAt: TextView = view.findViewById(R.id.createdAt)
         val likeCount: TextView = view.findViewById(R.id.likeCount)
         val userImage: ImageView = view.findViewById(R.id.profilePic)
-        val likeBtn: ImageView = view.findViewById(R.id.likeBtn)
+        val likeBtn: ToggleButton = view.findViewById(R.id.likeBtn)
         val optionBtn: ImageView = view.findViewById(R.id.postOptionMenu)
     }
 
@@ -62,19 +60,14 @@ class PostAdapter(options: FirestoreRecyclerOptions<Post>, private val listener:
         }
         holder.likeCount.text = likes
 
-        val dateFormat: DateFormat = SimpleDateFormat("dd-MM-yyyy h:mm a")
+        val dateFormat: DateFormat = SimpleDateFormat("MMM dd, yyyy h:mm a")
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = model.createdAt
         holder.createdAt.text = dateFormat.format(calendar.time)
         Glide.with(holder.userImage.context).load(model.createdBy.imageUrl).circleCrop().into(holder.userImage)
 
-        val isLiked = model.likedBy.contains(uid)
-
-        if(isLiked){
-            holder.likeBtn.setImageDrawable(ContextCompat.getDrawable(holder.likeBtn.context,R.drawable.ic_baseline_favorite_24))
-        }else{
-            holder.likeBtn.setImageDrawable(ContextCompat.getDrawable(holder.likeBtn.context,R.drawable.ic_baseline_favorite_border_24))
-        }
+        val isLiked = model.likedBy.contains(user)
+        holder.likeBtn.isChecked = isLiked
 
         holder.optionBtn.setOnClickListener {
             val menu = PopupMenu(holder.optionBtn.context,holder.optionBtn,Gravity.CENTER)

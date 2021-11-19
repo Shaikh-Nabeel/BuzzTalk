@@ -30,7 +30,7 @@
         <EditText
             android:id="@+id/postText"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="100dp"
             android:background="@drawable/border_for_post_text"
             android:gravity="top"
             android:hint="@string/post_hint"
@@ -39,20 +39,55 @@
             android:textColor="@color/white"
             android:textColorHint="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            app:layout_constraintTop_toBottomOf="@+id/postText"
+            tools:layout_editor_absoluteX="10dp" />
+
+        <RelativeLayout
+            android:id="@+id/layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/imageView"
+            tools:layout_editor_absoluteX="10dp"
+            android:padding="1dp">
+
+            <Button
+                android:id="@+id/camera"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:background="@drawable/camera_24"
+                android:layout_marginStart="65dp"
+                android:layout_alignParentStart="true"/>
+
+            <Button
+                android:id="@+id/gallery"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="65dp"
+                android:background="@drawable/image_24"/>
+
+        </RelativeLayout>
 
         <Button
             android:id="@+id/postBtn"
             android:layout_width="match_parent"
             android:layout_height="55dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="401dp"
+            android:layout_marginTop="12dp"
             android:text="@string/post"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.157"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/postText" />
+            app:layout_constraintTop_toBottomOf="@+id/layout" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

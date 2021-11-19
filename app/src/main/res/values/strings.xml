@@ -23,4 +23,6 @@
     <string name="space" />
     <string name="_0_post">0\nPost</string>
     <string name="username">username</string>
+    <string name="learn_more">Learn More</string>
+    <string name="accept_terms_and_conditions">Accept Terms and Conditions</string>
 </resources>

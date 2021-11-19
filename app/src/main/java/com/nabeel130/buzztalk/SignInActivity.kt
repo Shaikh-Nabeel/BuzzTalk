@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.browser.customtabs.CustomTabsIntent
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -38,7 +39,20 @@ class SignInActivity : AppCompatActivity() {
         auth = Firebase.auth
         googleSignInClient = GoogleSignIn.getClient(this,gso)
         binding.googleSignInBtn.setOnClickListener {
-            signIn()
+            if(binding.checkBoxforPrivacy.isChecked) {
+                signIn()
+            }else{
+                Toast.makeText(
+                    applicationContext,
+                    "Accept Terms and Conditions",
+                    Toast.LENGTH_SHORT
+                ).show();
+            }
+        }
+
+        binding.learnMoreTxt.setOnClickListener {
+            val builder = CustomTabsIntent.Builder().build()
+            builder.launchUrl(this, Uri.parse(getString(R.string.privacy_policy_link)))
         }
     }
 

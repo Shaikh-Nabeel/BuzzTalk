@@ -3,19 +3,18 @@ package com.nabeel130.buzztalk.fragments
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.nabeel130.buzztalk.MainActivity
-import com.nabeel130.buzztalk.ProfileViewModel
 import com.nabeel130.buzztalk.R
 import com.nabeel130.buzztalk.daos.PostDao
 import com.nabeel130.buzztalk.daos.UserDao
@@ -35,8 +34,6 @@ class ProfileFragment : Fragment(), IProfileAdapter {
     private lateinit var userDao: UserDao
     private lateinit var profileAdapter: ProfileAdapter
     private lateinit var postDao: PostDao
-    private lateinit var profileViewModel: ProfileViewModel
-//    private val TAG = "BuzzReport"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,7 +47,8 @@ class ProfileFragment : Fragment(), IProfileAdapter {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         //setting up profile pic and username
-        binding.progressBarForProfile.visibility = View.VISIBLE
+//        binding.progressBarForProfile.visibility = View.VISIBLE
+        Log.d(Helper.TAG, "Loading user details")
         userDao = UserDao()
         GlobalScope.launch(Dispatchers.IO){
             val userId = Firebase.auth.currentUser?.uid!!
@@ -61,11 +59,13 @@ class ProfileFragment : Fragment(), IProfileAdapter {
                         binding.userNameForFragments.text = user.userName
                         Glide.with(binding.profilePicForFragments.context).load(user.imageUrl)
                             .circleCrop().into(binding.profilePicForFragments)
-                        binding.progressBarForProfile.visibility = View.GONE
+//                        binding.progressBarForProfile.visibility = View.GONE
+                        Log.d(Helper.TAG, "Loading successful")
                     }
                 }
             }
         }
+
 
 //        profileViewModel = ViewModelProvider(this).get(ProfileViewModel::class.java)
 //        profileViewModel.currentUser().let {
@@ -75,6 +75,7 @@ class ProfileFragment : Fragment(), IProfileAdapter {
 //        }
 
         //fetching all post id of post, posted by current user
+        Log.d(Helper.TAG, "Loading post list..")
         val userPostDao = UserPostDao()
         GlobalScope.launch(Dispatchers.IO){
             userPostDao.getUserPost().addOnCompleteListener {
@@ -90,6 +91,8 @@ class ProfileFragment : Fragment(), IProfileAdapter {
                     profileAdapter = ProfileAdapter(list, this@ProfileFragment)
                     binding.recyclerViewForProfile.adapter = profileAdapter
                     binding.recyclerViewForProfile.layoutManager = LinearLayoutManager(context)
+                    Log.d(Helper.TAG, "Loading successful for post list")
+
                 }
             }
         }

@@ -25,4 +25,5 @@
     <string name="username">username</string>
     <string name="learn_more">Learn More</string>
     <string name="accept_terms_and_conditions">Accept Terms and Conditions</string>
+    <string name="posting">Posting...</string>
 </resources>

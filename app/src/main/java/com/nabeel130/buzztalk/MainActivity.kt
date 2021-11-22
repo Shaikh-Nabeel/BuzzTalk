@@ -24,12 +24,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.Query
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import com.nabeel130.buzztalk.daos.PostDao
 import com.nabeel130.buzztalk.daos.UserDao
 import com.nabeel130.buzztalk.databinding.ActivityMainBinding
 import com.nabeel130.buzztalk.fragments.ProfileFragment
 import com.nabeel130.buzztalk.models.Post
 import com.nabeel130.buzztalk.models.User
+import com.nabeel130.buzztalk.utility.Helper
 import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity(), IPostAdapter,
@@ -40,10 +42,9 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
     private lateinit var userDao: UserDao
     private lateinit var likeAdapter: LikeAdapter
     private lateinit var toggle: ActionBarDrawerToggle
-    private val TAG = "BuzzReport"
-
 
     companion object{
+        var isPostingCompleted = true
         private var instance: MainActivity? = null
 
         fun getInstance(): MainActivity{
@@ -73,6 +74,8 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         val profile: ImageView = view.findViewById(R.id.profilePicForMenuBar)
         val userName: TextView = view.findViewById(R.id.userNameForMenuBar)
 
+
+
         userDao = UserDao()
         GlobalScope.launch(Dispatchers.IO){
             val userId = Firebase.auth.currentUser?.uid!!
@@ -95,7 +98,6 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         loadAllPost()
     }
 
-
     private fun loadAllPost() {
         postDao = PostDao()
         val postCollection = postDao.postCollection
@@ -109,6 +111,26 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
     override fun onStart() {
         super.onStart()
         adapter.startListening()
+
+        //code to show posting message while post is being posted
+        binding.postingMssg.visibility = View.VISIBLE
+        GlobalScope.launch(Dispatchers.IO) {
+            var count = 1
+            while(true){
+                if(isPostingCompleted){
+                    Log.d(Helper.TAG, "count : $count")
+                    withContext(Dispatchers.Main){
+                        binding.postingMssg.visibility = View.GONE
+//                        Toast.makeText(this@MainActivity,
+//                        "Posted",Toast.LENGTH_SHORT).show()
+                    }
+                    break
+                }
+                count += 1
+                Log.d(Helper.TAG, "count : $count")
+                delay(500)
+            }
+        }
     }
 
     override fun onStop() {
@@ -158,20 +180,28 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         }
     }
 
-    override fun onDeletePostClicked(postId: String) {
+    override fun onDeletePostClicked(postId: String, uuid: String?) {
 
-        val dialog = buildDialogBox(getString(R.string.areYouSure),getString(R.string.dialog_text_1))
+        val dialog = Helper.buildDialogBox(this,getString(R.string.areYouSure),getString(R.string.dialog_text_1))
         val confirmBtn: Button = dialog.findViewById(R.id.confirm_button)
         val denyBtn: Button = dialog.findViewById(R.id.deny_button)
 
         confirmBtn.setOnClickListener {
             dialog.dismiss()
-            postDao.deletePost(postId).addOnCompleteListener {
-                if (it.isSuccessful)
-                    Toast.makeText(applicationContext, "Deleted", Toast.LENGTH_SHORT).show()
-                else
-                    Toast.makeText(applicationContext, "Couldn't delete", Toast.LENGTH_SHORT).show()
-                Log.d(TAG, "Post deleted status: " + it.exception?.message)
+            if(uuid != null) {
+                val storageRef = FirebaseStorage.getInstance().getReference("images/$uuid")
+                storageRef.delete().addOnSuccessListener {
+                    Log.d(Helper.TAG, "Image delete uuid: $uuid")
+                    postDao.deletePost(postId).addOnCompleteListener {
+                        if (it.isSuccessful)
+                            Toast.makeText(applicationContext, "Deleted", Toast.LENGTH_SHORT).show()
+                        else
+                            Toast.makeText(applicationContext, "Couldn't delete", Toast.LENGTH_SHORT).show()
+                        Log.d(Helper.TAG, "Post deleted status: " + it.exception?.message)
+                    }
+                }.addOnFailureListener {
+                    Log.d(Helper.TAG, it.message.toString())
+                }
             }
         }
 
@@ -197,7 +227,6 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
                 binding.createPostBtn.visibility = View.GONE
                 supportFragmentManager.beginTransaction().apply {
                     replace(R.id.frameLayoutForFragments,profileFragment)
-//                    replace(R.id.frameLayoutForFragments,profileFragment)
                     addToBackStack(null)
                     commit()
                 }
@@ -232,25 +261,10 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         }
     }
 
-    private fun buildDialogBox(title: String,subTitle: String): Dialog{
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.setContentView(R.layout.custom_dialog_box)
-        dialog.setCancelable(false)
-        dialog.window?.attributes?.windowAnimations = R.style.PauseDialogAnimation
-
-        val confirmText = dialog.findViewById<TextView>(R.id.txtAreYouSure)
-        val aboutAction = dialog.findViewById<TextView>(R.id.txtForDeleteDialog)
-        confirmText.text = title
-        aboutAction.text = subTitle
-
-        return dialog
-    }
 
     @SuppressLint("SetTextI18n")
     private fun singOut() {
-        val dialog = buildDialogBox(getString(R.string.logout),getString(R.string.dialog_text_2))
+        val dialog = Helper.buildDialogBox(this,getString(R.string.logout),getString(R.string.dialog_text_2))
 
         val confirmBtn: Button = dialog.findViewById(R.id.confirm_button)
         val denyBtn: Button = dialog.findViewById(R.id.deny_button)

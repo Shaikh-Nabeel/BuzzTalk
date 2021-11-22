@@ -8,6 +8,7 @@
     android:fitsSystemWindows="true"
     tools:context=".MainActivity"
     tools:openDrawer="start"
+
     >
 
     <com.google.android.material.navigation.NavigationView
@@ -38,7 +39,6 @@
         android:background="?attr/colorPrimaryVariant"
         android:maxHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
-        app:navigationIcon="@drawable/ic_baseline_person_24"
         />
 
         <FrameLayout
@@ -119,12 +119,26 @@
             />
 
     </RelativeLayout>
+
+        <TextView
+            android:id="@+id/postingMssg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/customToolB"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:background="#169300"
+            android:text="@string/posting"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:visibility="gone"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         tools:listitem="@layout/recycler_view_item"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/customToolB"
+        android:layout_below="@+id/postingMssg"
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"

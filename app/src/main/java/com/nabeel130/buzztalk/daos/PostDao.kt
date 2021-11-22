@@ -1,6 +1,6 @@
 package com.nabeel130.buzztalk.daos
 
-import android.util.Log
+
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentSnapshot
@@ -13,7 +13,6 @@ import com.nabeel130.buzztalk.models.UserPost
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class PostDao {
 
@@ -22,18 +21,20 @@ class PostDao {
     private val auth = Firebase.auth
     private val userDao = UserDao()
     private val userPostDao = UserPostDao()
+
     companion object {
         lateinit var lastPost: Post
     }
 
-    fun addPost(text: String){
+
+    fun addPost(text: String, uuid: String?){
         GlobalScope.launch(Dispatchers.IO) {
             val createdAt = System.currentTimeMillis()
             lateinit var createdBy: User
             userDao.getUserById(auth.currentUser!!.uid).addOnCompleteListener{ user ->
                 if (user.isSuccessful) {
                     createdBy = user.result.toObject(User::class.java)!!
-                    val post = Post(text,createdBy,createdAt)
+                    val post = Post(text,createdBy,createdAt,uuid)
                     lastPost = post
                     postCollection.document().set(post)
 
@@ -41,10 +42,8 @@ class PostDao {
                     userPostDao.getUserPost().addOnCompleteListener { userSnapshot ->
                         if(userSnapshot.isSuccessful){
                             val userPost = if(userSnapshot.result.exists()){
-                                Log.d("BuzzReport", "Object Exist")
                                 userSnapshot.result.toObject(UserPost::class.java)!!
                             }else{
-                                Log.d("BuzzReport", "Making new Object")
                                 UserPost()
                             }
                             getLastPostId().addOnCompleteListener {
@@ -63,7 +62,9 @@ class PostDao {
         }
     }
 
-    fun getLastPostId(): Task<QuerySnapshot> {
+
+
+    private fun getLastPostId(): Task<QuerySnapshot> {
         return postCollection.whereEqualTo("createdAt", lastPost.createdAt)
             .whereEqualTo("postText", lastPost.postText)
             .get()

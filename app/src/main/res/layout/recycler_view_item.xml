@@ -25,7 +25,7 @@
             android:contentDescription="@string/app_name"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:background="@color/white" />
+            tools:background="@drawable/app_icon" />
 
         <TextView
             android:id="@+id/userName"
@@ -59,57 +59,78 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_marginTop="3dp"
-            android:textColor="#CFCACA"
             android:fontFamily="casual"
+            android:textColor="#CFCACA"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/profilePic"
             app:layout_constraintTop_toBottomOf="@+id/userName"
             tools:text="12-12-2001 22:33 am" />
 
-        <TextView
-            android:id="@+id/postContent"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:id="@+id/linLayoutPost"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:background="@drawable/post_text_background"
-            android:padding="5dp"
-            android:singleLine="false"
-            android:textColor="@color/white"
-            android:textSize="16sp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@+id/likeBtn"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profilePic"
-            tools:text="hey, there it is my first post" />
+            app:layout_constraintTop_toBottomOf="@+id/profilePic">
+
+            <TextView
+                android:id="@+id/postContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:singleLine="false"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                tools:text="hey, there it is my first post" />
+
+            <ImageView
+                android:id="@+id/postImage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:contentDescription="@string/post"
+                android:padding="1dp"
+                android:src="@drawable/galler_image_bg_24"
+                android:scaleType="fitXY"
+                android:visibility="gone" />
+        </LinearLayout>
 
         <ToggleButton
             android:id="@+id/likeBtn"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:background="@drawable/like_toggle_selector"
             android:text="@string/space"
             android:textOff=""
             android:textOn=""
-            android:background="@drawable/like_toggle_selector"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/postContent" />
+            app:layout_constraintTop_toBottomOf="@+id/linLayoutPost"
+            tools:ignore="TouchTargetSizeCheck" />
 
         <TextView
             android:id="@+id/likeCount"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
+            android:layout_marginStart="12dp"
             android:layout_marginTop="8dp"
-            android:fontFamily="sans-serif-black"
             android:layout_marginBottom="8dp"
-            android:padding="5dp"
+            android:fontFamily="sans-serif-black"
+            android:padding="6dp"
             android:textColor="@color/white"
-            android:textSize="13sp"
+            android:textSize="14sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/likeBtn"
-            app:layout_constraintTop_toBottomOf="@+id/postContent"
+            app:layout_constraintTop_toBottomOf="@+id/linLayoutPost"
             tools:ignore="RtlSymmetry"
             tools:text="23 likes" />
 

@@ -6,11 +6,14 @@
     android:background="@drawable/border_for_post_text"
     android:layout_margin="2dp"
     android:orientation="vertical"
+    android:backgroundTint="@color/matt_black"
     >
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="2dp">
 
         <TextView
             android:id="@+id/createdAt_Profile"
@@ -23,8 +26,8 @@
             android:layout_marginTop="5dp"
             android:padding="2dp"
             android:paddingStart="4dp"
-            android:textColor="#D8CBCB"
-            android:textSize="12sp"
+            android:textColor="@color/white_90"
+            android:textSize="13sp"
             tools:ignore="RtlSymmetry"
             tools:text="12/23/2001"
             />
@@ -38,7 +41,8 @@
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
             android:contentDescription="@string/more_btn"
-            android:src="@drawable/ic_baseline_more_vert_24"/>
+            android:backgroundTint="@color/white_1"
+            android:background="@drawable/ic_baseline_more_vert_24"/>
 
         </RelativeLayout>
 
@@ -48,9 +52,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:padding="3dp"
-            android:paddingStart="4dp"
             android:singleLine="false"
-            android:textColor="@color/white"
+            android:textColor="@color/white_1"
             android:textSize="16sp"
             android:background="@drawable/post_text_background"
             tools:ignore="RtlSymmetry"
@@ -59,19 +62,18 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginBottom="5dp"
-            tools:ignore="UseCompoundDrawables">
+            android:layout_margin="5dp"
+            >
 
             <ToggleButton
                 android:id="@+id/likeBtn_Profile"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:background="@drawable/like_toggle_selector"
+                android:text="@string/space"
                 android:textOff=""
                 android:textOn=""
-                android:text="@string/space"
-               />
+                tools:ignore="TouchTargetSizeCheck" />
 
             <TextView
                 android:id="@+id/likeCount_Profile"
@@ -79,8 +81,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:padding="3dp"
-                android:textColor="@color/white"
-                android:textSize="12sp"
+                android:textColor="@color/white_1"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 tools:text="24 likes" />
         </LinearLayout>

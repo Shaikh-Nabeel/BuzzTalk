@@ -30,14 +30,14 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.util.*
 
+
 class CreatePostActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCreatePostBinding
-    private var uri: Uri? = null
+    private var mUri: Uri? = null
     private lateinit var file: File
-
     private var isImageSelected = false
-    val postDao = PostDao()
+    private val postDao = PostDao()
 
     override fun onBackPressed() {
         super.onBackPressed()
@@ -51,7 +51,7 @@ class CreatePostActivity : AppCompatActivity() {
 
         verifyStoragePermissions(this)
 
-        binding.customToolB2.title = getString(R.string.app_name)
+        binding.customToolB2.title = getString(R.string.post)
         binding.customToolB2.setTitleTextColor(Color.WHITE)
 
 
@@ -59,14 +59,14 @@ class CreatePostActivity : AppCompatActivity() {
             val text = binding.postText.text.toString()
 
             if(text.length > 150){
-                Toast.makeText(this,"Length should be less than 300 characters",Toast.LENGTH_SHORT).show()
+                Toast.makeText(this,"Length should be less than 150 characters",Toast.LENGTH_SHORT).show()
             }else if(text.isNotBlank() && text.isNotEmpty() || isImageSelected){
 
                 var uuid: String? = null
                 if(isImageSelected) {
                     isImageSelected = !isImageSelected
                     uuid = UUID.randomUUID().toString()
-                    uploadImage(text,uri!!,uuid)
+                    uploadImage(text,mUri!!, uuid)
                 }else{
                     postDao.addPost(text,uuid)
                 }
@@ -99,16 +99,36 @@ class CreatePostActivity : AppCompatActivity() {
 
     private var camLauncher = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
 
-        assert(result.data != null)
-        val bitmap = result.data?.extras?.get("data") as Bitmap
-        binding.imageViewPost.visibility = View.VISIBLE
-        binding.imageViewPost.setImageBitmap(bitmap)
-        try {
+        try { //#454545
+
+            assert(result.data != null)
+            if(result.data?.extras == null) throw IOException("Can't take pictures.")
+//            val data = result.data?.data
+            val bitmap = result.data?.extras?.get("data") as Bitmap
+
+            binding.imageViewPost.visibility = View.VISIBLE
+            binding.imageViewPost.setImageBitmap(bitmap)
+
             val newFile = File(cacheDir, "capturedImg.jpeg")
-            newFile.createNewFile()
+            if(!newFile.exists()){
+                newFile.createNewFile()
+                Log.d(Helper.TAG, "creating new image file.")
+            }else{
+                if(newFile.delete()){
+                    Log.d(Helper.TAG, "deleted image file.")
+                    if(newFile.createNewFile()){
+                        Log.d(Helper.TAG, "created new image file.")
+                    }else{
+                        Log.d(Helper.TAG, "Cannot create image file")
+                    }
+                }else{
+                    Log.d(Helper.TAG, "Could not create image file.")
+                    return@registerForActivityResult
+                }
+            }
 
             val bos = ByteArrayOutputStream()
-            if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 0, bos)) {
+            if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos)) {
                 throw IOException("Couldn't upload image")
             }
             val bitmapData = bos.toByteArray()
@@ -119,9 +139,12 @@ class CreatePostActivity : AppCompatActivity() {
                 it.flush()
                 it.close()
             }
+
             file = newFile
-            uri = Uri.fromFile(file)
+            mUri = Uri.fromFile(newFile)
+            Log.d(Helper.TAG, "mUri $mUri\n encoded path: ${mUri?.encodedPath}")
             isImageSelected = true
+
 
         } catch (e: IOException) {
             Log.d(Helper.TAG, "IOException : " + e.message)
@@ -132,10 +155,10 @@ class CreatePostActivity : AppCompatActivity() {
     private val galleryLauncher = registerForActivityResult( StartActivityForResult()
     ) { result ->
         if(result.resultCode == RESULT_OK){
-            uri = result.data?.data!!
-            if(uri != null) {
+            mUri = result.data?.data!!
+            if(mUri != null) {
                 binding.imageViewPost.visibility = View.VISIBLE
-                Glide.with(this).load(uri).into(binding.imageViewPost)
+                Glide.with(this).load(mUri).into(binding.imageViewPost)
                 isImageSelected = true
             }else{
                 Toast.makeText(

@@ -52,11 +52,17 @@ class ProfileAdapter(private val listOfPost: ArrayList<String>, private val list
             postDao.getPostById(listOfPost[position]).addOnCompleteListener {
                 if(it.isSuccessful){
                     val model = it.result.toObject(Post::class.java)!!
-                    val dateFormat: DateFormat = SimpleDateFormat("MMM dd,yyyy h:mm a")
+
+                    val dateFormat: DateFormat = SimpleDateFormat("MMM dd, yyyy h:mm a")
                     val calendar = Calendar.getInstance()
                     calendar.timeInMillis = model.createdAt
                     holder.createdAt.text = dateFormat.format(calendar.time)
-                    holder.postText.text = model.postText
+
+                    if (!model.postText.contentEquals("")) {
+                        holder.postText.text = model.postText
+                    } else {
+                        holder.postText.text = "[photo]"
+                    }
 
                     val likes: String = if(model.likedBy.size > 1){
                         model.likedBy.size.toString()+" likes"

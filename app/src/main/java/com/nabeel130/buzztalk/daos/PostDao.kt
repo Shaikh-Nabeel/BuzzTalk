@@ -13,10 +13,11 @@ import com.nabeel130.buzztalk.models.UserPost
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class PostDao {
 
-    val db = FirebaseFirestore.getInstance()
+    private val db = FirebaseFirestore.getInstance()
     val postCollection = db.collection("posts")
     private val auth = Firebase.auth
     private val userDao = UserDao()
@@ -62,8 +63,6 @@ class PostDao {
         }
     }
 
-
-
     private fun getLastPostId(): Task<QuerySnapshot> {
         return postCollection.whereEqualTo("createdAt", lastPost.createdAt)
             .whereEqualTo("postText", lastPost.postText)
@@ -71,6 +70,8 @@ class PostDao {
     }
 
     fun deletePost(uid: String): Task<Void>{
+        return runBlocking{
+
         GlobalScope.launch(Dispatchers.IO){
             userPostDao.getUserPost().addOnCompleteListener {
                 if(it.isSuccessful){
@@ -80,7 +81,8 @@ class PostDao {
                 }
             }
         }
-        return postCollection.document(uid).delete()
+            return@runBlocking postCollection.document(uid).delete()
+        }
     }
 
     fun getPostById(uid: String): Task<DocumentSnapshot> {

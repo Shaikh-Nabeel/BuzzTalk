@@ -10,10 +10,11 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
+        android:layout_marginStart="3dp"
         android:layout_marginTop="5dp"
-        android:layout_marginEnd="5dp"
+        android:layout_marginEnd="3dp"
         android:layout_marginBottom="5dp"
+        android:backgroundTint="@color/matt_black"
         android:background="@drawable/border_for_post_text"
         android:padding="10dp">
 
@@ -34,8 +35,7 @@
             android:layout_marginStart="5dp"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
-            android:fontFamily="sans-serif-medium"
-            android:textColor="@color/white"
+            android:textColor="@color/white_1"
             android:textSize="16sp"
             app:layout_constraintEnd_toStartOf="@id/postOptionMenu"
             app:layout_constraintStart_toEndOf="@+id/profilePic"
@@ -49,7 +49,8 @@
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
             android:contentDescription="@string/more_btn"
-            android:src="@drawable/ic_baseline_more_vert_24"
+            android:backgroundTint="@color/white_90"
+            android:background="@drawable/ic_baseline_more_vert_24"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -59,19 +60,19 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_marginTop="3dp"
-            android:fontFamily="casual"
-            android:textColor="#CFCACA"
+            android:textColor="@color/white_3"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/profilePic"
             app:layout_constraintTop_toBottomOf="@+id/userName"
+            tools:ignore="TextContrastCheck"
             tools:text="12-12-2001 22:33 am" />
 
         <LinearLayout
             android:id="@+id/linLayoutPost"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
             android:layout_marginBottom="8dp"
             android:background="@drawable/post_text_background"
             android:orientation="vertical"
@@ -86,19 +87,18 @@
                 android:layout_height="wrap_content"
                 android:padding="10dp"
                 android:singleLine="false"
-                android:textColor="@color/white"
+                android:textColor="@color/white_1"
                 android:textSize="16sp"
                 tools:text="hey, there it is my first post" />
 
             <ImageView
                 android:id="@+id/postImage"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="400dp"
                 android:layout_gravity="center"
                 android:contentDescription="@string/post"
                 android:padding="1dp"
                 android:src="@drawable/galler_image_bg_24"
-                android:scaleType="fitXY"
                 android:visibility="gone" />
         </LinearLayout>
 
@@ -123,9 +123,8 @@
             android:layout_marginStart="12dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:fontFamily="sans-serif-black"
             android:padding="6dp"
-            android:textColor="@color/white"
+            android:textColor="@color/white_1"
             android:textSize="14sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"

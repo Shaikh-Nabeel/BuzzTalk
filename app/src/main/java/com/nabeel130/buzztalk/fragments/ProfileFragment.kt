@@ -96,6 +96,7 @@ class ProfileFragment : Fragment(), IProfileAdapter {
                 }
             }
         }
+        postDao = PostDao()
     }
 
     override fun onDestroyView() {

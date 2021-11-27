@@ -1,10 +1,8 @@
 package com.nabeel130.buzztalk
 
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -121,8 +119,8 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
                     Log.d(Helper.TAG, "count : $count")
                     withContext(Dispatchers.Main){
                         binding.postingMssg.visibility = View.GONE
-//                        Toast.makeText(this@MainActivity,
-//                        "Posted",Toast.LENGTH_SHORT).show()
+                        Toast.makeText(applicationContext,
+                        "Posted",Toast.LENGTH_SHORT).show()
                     }
                     break
                 }
@@ -151,7 +149,7 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
 
     private var listOfLikedUser: ArrayList<String> = ArrayList()
 
-    //function to show name of user who have liked current post
+    //function to show name of user who have liked the current post
     @SuppressLint("NotifyDataSetChanged")
     override fun onLikeCountClicked(postId: String) {
 
@@ -192,16 +190,12 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
                 val storageRef = FirebaseStorage.getInstance().getReference("images/$uuid")
                 storageRef.delete().addOnSuccessListener {
                     Log.d(Helper.TAG, "Image delete uuid: $uuid")
-                    postDao.deletePost(postId).addOnCompleteListener {
-                        if (it.isSuccessful)
-                            Toast.makeText(applicationContext, "Deleted", Toast.LENGTH_SHORT).show()
-                        else
-                            Toast.makeText(applicationContext, "Couldn't delete", Toast.LENGTH_SHORT).show()
-                        Log.d(Helper.TAG, "Post deleted status: " + it.exception?.message)
-                    }
+                    deletePostData(postId)
                 }.addOnFailureListener {
                     Log.d(Helper.TAG, it.message.toString())
                 }
+            } else{
+                deletePostData(postId)
             }
         }
 
@@ -210,6 +204,16 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         }
 
         dialog.show()
+    }
+
+    private fun deletePostData(postId: String){
+        postDao.deletePost(postId).addOnCompleteListener {
+            if (it.isSuccessful)
+                Toast.makeText(applicationContext, "Deleted", Toast.LENGTH_SHORT).show()
+            else
+                Toast.makeText(applicationContext, "Couldn't delete", Toast.LENGTH_SHORT).show()
+            Log.d(Helper.TAG, "Post deleted status: " + it.exception?.message)
+        }
     }
 
     override fun onShareClicked(text: String, userName: String) {

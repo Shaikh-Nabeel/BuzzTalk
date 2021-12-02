@@ -1,17 +1,20 @@
 package com.nabeel130.buzztalk
 
 import android.annotation.SuppressLint
+import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.PopupMenu
-import android.widget.TextView
-import android.widget.ToggleButton
+import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.auth.ktx.auth
@@ -37,6 +40,7 @@ class PostAdapter(options: FirestoreRecyclerOptions<Post>, private val listener:
         val likeCount: TextView = view.findViewById(R.id.likeCount)
         val userImage: ImageView = view.findViewById(R.id.profilePic)
         val likeBtn: ToggleButton = view.findViewById(R.id.likeBtn)
+        val progress: ProgressBar = view.findViewById(R.id.progressBarForImage)
         val optionBtn: ImageView = view.findViewById(R.id.postOptionMenu)
         val postImage: ImageView = view.findViewById(R.id.postImage)
     }
@@ -83,10 +87,28 @@ class PostAdapter(options: FirestoreRecyclerOptions<Post>, private val listener:
 
         //loading post image if exist
         if (model.imageUuid != null) {
+            holder.progress.visibility = View.VISIBLE
             holder.postImage.visibility = View.VISIBLE
             val ref = storageRef.child("images/${model.imageUuid}")
             GlideApp.with(holder.postImage.context)
                 .load(ref)
+                .listener(object: RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?, model: Any?, target: Target<Drawable>?,
+                        isFirstResource: Boolean): Boolean {
+                        holder.progress.visibility = View.GONE
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?, model: Any?,
+                        target: Target<Drawable>?, dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        holder.progress.visibility = View.GONE
+                        return false
+                    }
+                })
                 .into(holder.postImage)
         } else {
             holder.postImage.visibility = View.GONE

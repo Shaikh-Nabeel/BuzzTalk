@@ -46,18 +46,33 @@
 
         </RelativeLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:orientation="vertical"
+        android:background="@drawable/post_text_background"
+        >
+
         <TextView
             android:id="@+id/postText_Profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:padding="3dp"
-            android:singleLine="false"
+            android:padding="10dp"
             android:textColor="@color/white_1"
             android:textSize="16sp"
-            android:background="@drawable/post_text_background"
-            tools:ignore="RtlSymmetry"
             tools:text="Hyy, Ramesh Gutka here, Bolo zuban kesari" />
+
+        <ImageView
+            android:id="@+id/postImage_Profile"
+            android:layout_width="match_parent"
+            android:layout_height="450dp"
+            android:layout_gravity="center"
+            android:contentDescription="@string/post"
+            android:padding="1dp"
+            tools:ignore="ImageContrastCheck"
+            android:src="@drawable/galler_image_bg_24"/>
+    </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -85,5 +100,7 @@
                 android:textSize="14sp"
                 android:textStyle="bold"
                 tools:text="24 likes" />
+
         </LinearLayout>
+
 </LinearLayout>

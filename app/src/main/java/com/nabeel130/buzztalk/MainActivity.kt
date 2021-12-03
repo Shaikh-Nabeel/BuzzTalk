@@ -61,8 +61,8 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         binding.customToolB.title = getString(R.string.app_name)
         binding.customToolB.setTitleTextColor(Color.WHITE)
         setSupportActionBar(binding.customToolB)
-        binding.navigationView.bringToFront()
 
+        binding.navigationView.bringToFront()
         toggle = ActionBarDrawerToggle(this,binding.drawableLayout,binding.customToolB,R.string.navigation_open,R.string.navigation_close)
         binding.drawableLayout.addDrawerListener(toggle)
         toggle.syncState()
@@ -71,8 +71,6 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         val view = binding.navigationView.getHeaderView(0)
         val profile: ImageView = view.findViewById(R.id.profilePicForMenuBar)
         val userName: TextView = view.findViewById(R.id.userNameForMenuBar)
-
-
 
         userDao = UserDao()
         GlobalScope.launch(Dispatchers.IO){
@@ -111,22 +109,26 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         adapter.startListening()
 
         //code to show posting message while post is being posted
-        binding.postingMssg.visibility = View.VISIBLE
-        GlobalScope.launch(Dispatchers.IO) {
-            var count = 1
-            while(true){
-                if(isPostingCompleted){
-                    Log.d(Helper.TAG, "count : $count")
-                    withContext(Dispatchers.Main){
-                        binding.postingMssg.visibility = View.GONE
-                        Toast.makeText(applicationContext,
-                        "Posted",Toast.LENGTH_SHORT).show()
+        if(!isPostingCompleted) {
+            binding.postingMssg.visibility = View.VISIBLE
+            GlobalScope.launch(Dispatchers.IO) {
+                var count = 1
+                while (true) {
+                    if (isPostingCompleted) {
+                        Log.d(Helper.TAG, "count : $count")
+                        withContext(Dispatchers.Main) {
+                            binding.postingMssg.visibility = View.GONE
+                            Toast.makeText(
+                                applicationContext,
+                                "Posted", Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        break
                     }
-                    break
+                    count += 1
+                    Log.d(Helper.TAG, "count : $count")
+                    delay(500)
                 }
-                count += 1
-                Log.d(Helper.TAG, "count : $count")
-                delay(500)
             }
         }
     }
@@ -226,6 +228,9 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.profileDetails -> {
+                binding.drawableLayout.closeDrawer(binding.navigationView)
+                if(binding.recyclerView.visibility == View.GONE)
+                    return true
                 val profileFragment = ProfileFragment()
                 binding.recyclerView.visibility = View.GONE
                 binding.createPostBtn.visibility = View.GONE
@@ -234,7 +239,6 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
                     addToBackStack(null)
                     commit()
                 }
-                binding.drawableLayout.closeDrawer(binding.navigationView)
                 true
             }
             R.id.privacyPolicy -> {

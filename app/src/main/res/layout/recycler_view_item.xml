@@ -112,7 +112,6 @@
                 android:layout_gravity="center"
                 android:contentDescription="@string/post"
                 android:padding="1dp"
-                android:visibility="visible"
                 tools:ignore="ImageContrastCheck" />
         </LinearLayout>
 

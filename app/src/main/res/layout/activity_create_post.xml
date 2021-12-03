@@ -18,98 +18,107 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:padding="10dp"
-        app:layout_constraintVertical_bias="0"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/customToolB2"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/customToolB2">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        >
 
-        <EditText
-            android:id="@+id/postText"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border_for_post_text"
-            android:gravity="top"
-            android:hint="@string/post_hint"
-            android:importantForAutofill="no"
-            android:inputType="textMultiLine"
-            android:minLines="3"
-            android:maxLines="3"
-            android:padding="15dp"
-            android:textColor="@color/white"
-            android:textColorHint="@color/white"
-            app:layout_constraintBottom_toTopOf="@+id/imageViewPost"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_height="0dp"
+            android:padding="10dp"
+            >
 
-        <ImageView
-            android:id="@+id/imageViewPost"
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:padding="5dp"
-            android:contentDescription="@string/space"
-            android:visibility="gone"
-            android:background="@drawable/custom_dialog_design1"
-            app:layout_constraintBottom_toTopOf="@+id/relativeLayoutImg"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/postText" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toTopOf="@+id/relativeLayoutImg"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:orientation="vertical"
+                android:id="@+id/linLayoutTextPost"
+                >
 
-        <LinearLayout
-            android:id="@+id/relativeLayoutImg"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/post_text_background"
-            app:layout_constraintBottom_toTopOf="@+id/postBtn"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageViewPost">
+                <EditText
+                    android:id="@+id/postText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:hint="@string/post_hint"
+                    android:importantForAutofill="no"
+                    android:inputType="textMultiLine"
+                    android:minLines="3"
+                    android:padding="10dp"
+                    android:background="@color/matt_black"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/white" />
 
-            <ImageView
-                android:id="@+id/camera"
-                style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_weight="1"
-                android:contentDescription="@string/app_name"
-                android:src="@drawable/camera_24"
-                tools:ignore="DuplicateSpeakableTextCheck,TouchTargetSizeCheck" />
+                <ImageView
+                    android:id="@+id/imageViewPost"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:padding="5dp"
+                    android:scaleType="fitXY"
+                    android:contentDescription="@string/space"
+                    android:visibility="gone" />
+            </LinearLayout>
 
-            <ImageView
-                android:id="@+id/gallery"
-                style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_weight="1"
-                android:contentDescription="@string/app_name"
-                android:src="@drawable/gallery_24"
-                tools:ignore="TouchTargetSizeCheck" />
+            <LinearLayout
+                android:id="@+id/relativeLayoutImg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/post_text_background"
+                app:layout_constraintBottom_toTopOf="@+id/postBtn"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linLayoutTextPost">
 
-        </LinearLayout>
+                <ImageView
+                    android:id="@+id/camera"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/camera_24"
+                    tools:ignore="DuplicateSpeakableTextCheck,TouchTargetSizeCheck" />
 
-        <Button
-            android:id="@+id/postBtn"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:layout_marginTop="12dp"
-            android:text="@string/post"
-            android:textSize="16sp"
-            android:textColor="@color/white_1"
-            android:textStyle="bold"
-            android:background="@drawable/border_for_post_text"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/relativeLayoutImg" />
+                <ImageView
+                    android:id="@+id/gallery"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/gallery_24"
+                    tools:ignore="TouchTargetSizeCheck" />
 
+            </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <Button
+                android:id="@+id/postBtn"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_marginTop="12dp"
+                android:text="@string/post"
+                android:textSize="16sp"
+                android:textColor="@color/white_1"
+                android:textStyle="bold"
+                android:background="@drawable/border_for_post_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/relativeLayoutImg" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

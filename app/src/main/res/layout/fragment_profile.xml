@@ -66,8 +66,8 @@
     <View
         android:id="@+id/viewDividerForProfile"
         android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/white"
+        android:layout_height="1dp"
+        android:background="@color/white_1"
         app:layout_constraintTop_toBottomOf="@id/userNameForFragments"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

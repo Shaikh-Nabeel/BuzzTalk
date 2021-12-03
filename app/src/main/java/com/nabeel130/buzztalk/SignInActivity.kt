@@ -32,10 +32,12 @@ class SignInActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySignInBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken("270364308072-f87u344doh6a96otasu8n8o5grcjmk7i.apps.googleusercontent.com")
             .requestEmail()
             .build()
+
         auth = Firebase.auth
         googleSignInClient = GoogleSignIn.getClient(this,gso)
         binding.googleSignInBtn.setOnClickListener {
@@ -46,7 +48,7 @@ class SignInActivity : AppCompatActivity() {
                     applicationContext,
                     "Accept Terms and Conditions",
                     Toast.LENGTH_SHORT
-                ).show();
+                ).show()
             }
         }
 

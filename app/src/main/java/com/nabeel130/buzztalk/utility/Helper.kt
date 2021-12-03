@@ -1,5 +1,6 @@
 package com.nabeel130.buzztalk.utility
 
+import android.Manifest
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
@@ -10,6 +11,14 @@ import com.nabeel130.buzztalk.R
 
 class Helper {
     companion object {
+
+        const val TAG = "BuzzReport"
+
+        val PERMISSIONS_STORAGE_CAMERA = arrayOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.CAMERA
+        )
+
         fun buildDialogBox(context: Context, title: String, subTitle: String): Dialog {
             val dialog = Dialog(context)
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)

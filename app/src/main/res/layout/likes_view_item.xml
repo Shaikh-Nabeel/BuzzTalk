@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@drawable/border_for_post_text"
     android:layout_margin="1dp"
-    android:padding="16dp">
+    android:padding="14dp">
 
     <ImageView
         android:layout_width="35dp"
@@ -24,7 +24,7 @@
         android:layout_toEndOf="@+id/profilePicForLike"
         android:layout_margin="8dp"
         android:singleLine="true"
-        android:textColor="@color/white"
+        android:textColor="@color/white_1"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:paddingStart="5dp"

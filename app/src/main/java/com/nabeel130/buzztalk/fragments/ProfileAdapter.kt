@@ -1,6 +1,7 @@
 package com.nabeel130.buzztalk.fragments
 
 import android.annotation.SuppressLint
+import android.graphics.drawable.Drawable
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -10,11 +11,17 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.ToggleButton
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.nabeel130.buzztalk.R
 import com.nabeel130.buzztalk.daos.PostDao
 import com.nabeel130.buzztalk.models.Post
+import com.nabeel130.buzztalk.storageRef
+import com.nabeel130.buzztalk.utility.GlideApp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -36,6 +43,7 @@ class ProfileAdapter(private val listOfPost: ArrayList<String>, private val list
         val likeBtn: ToggleButton = view.findViewById(R.id.likeBtn_Profile)
         val likeCount: TextView = view.findViewById(R.id.likeCount_Profile)
         val optionBtn: ImageView = view.findViewById(R.id.postOptionMenuFragment)
+        val postImage: ImageView = view.findViewById(R.id.postImage_Profile)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProfileViewHolder {
@@ -52,11 +60,17 @@ class ProfileAdapter(private val listOfPost: ArrayList<String>, private val list
             postDao.getPostById(listOfPost[position]).addOnCompleteListener {
                 if(it.isSuccessful){
                     val model = it.result.toObject(Post::class.java)!!
-                    val dateFormat: DateFormat = SimpleDateFormat("MMM dd,yyyy h:mm a")
+
+                    val dateFormat: DateFormat = SimpleDateFormat("MMM dd, yyyy h:mm a")
                     val calendar = Calendar.getInstance()
                     calendar.timeInMillis = model.createdAt
                     holder.createdAt.text = dateFormat.format(calendar.time)
-                    holder.postText.text = model.postText
+
+                    if (!model.postText.contentEquals("")) {
+                        holder.postText.text = model.postText
+                    } else {
+                        holder.postText.visibility = View.GONE
+                    }
 
                     val likes: String = if(model.likedBy.size > 1){
                         model.likedBy.size.toString()+" likes"
@@ -64,9 +78,17 @@ class ProfileAdapter(private val listOfPost: ArrayList<String>, private val list
                         model.likedBy.size.toString()+" like"
                     }
                     holder.likeCount.text = likes
+                    holder.likeBtn.isChecked = model.likedBy.contains(uid)
 
-                    val isLiked = model.likedBy.contains(uid)
-                    holder.likeBtn.isChecked = isLiked
+                    if (model.imageUuid != null) {
+                        holder.postImage.visibility = View.VISIBLE
+                        val ref = storageRef.child("images/${model.imageUuid}")
+                        GlideApp.with(holder.postImage.context)
+                            .load(ref)
+                            .into(holder.postImage)
+                    } else {
+                        holder.postImage.visibility = View.GONE
+                    }
 
                     holder.optionBtn.setOnClickListener {
                         val menu = PopupMenu(holder.optionBtn.context,holder.optionBtn, Gravity.CENTER)

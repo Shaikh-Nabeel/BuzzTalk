@@ -4,15 +4,16 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.MenuItem
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -22,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.Query
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import com.nabeel130.buzztalk.daos.PostDao
 import com.nabeel130.buzztalk.daos.UserDao
@@ -29,11 +31,18 @@ import com.nabeel130.buzztalk.databinding.ActivityMainBinding
 import com.nabeel130.buzztalk.fragments.ProfileFragment
 import com.nabeel130.buzztalk.models.Post
 import com.nabeel130.buzztalk.models.User
+import com.nabeel130.buzztalk.notifications.Notifications
+import com.nabeel130.buzztalk.notifications.PushNotification
 import com.nabeel130.buzztalk.utility.Helper
+import com.nabeel130.buzztalk.utility.Helper.Companion.MESSAGE
+import com.nabeel130.buzztalk.utility.Helper.Companion.TITLE
+import com.nabeel130.buzztalk.utility.Helper.Companion.TOPIC
+import com.nabeel130.buzztalk.utility.RetrofitInstance
 import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity(), IPostAdapter,
     NavigationView.OnNavigationItemSelectedListener {
+
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: PostAdapter
     private lateinit var postDao: PostDao
@@ -50,6 +59,10 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
                 instance = this
             }
         }
+
+        lateinit var currentUserName: String
+        lateinit var currentUserId: String
+        lateinit var currentUserProfileUrl: String
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,6 +93,10 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
                     val user = it.result.toObject(User::class.java)
                     if (user != null) {
                         userName.text = user.userName
+                        //storing username and uid for sending notification
+                        currentUserName = user.userName!!
+                        currentUserId = user.uid
+                        currentUserProfileUrl = user.imageUrl ?: ""
                         Glide.with(applicationContext).load(user.imageUrl).circleCrop().into(profile)
                     }
                 }
@@ -92,6 +109,22 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         }
 
         loadAllPost()
+
+        //subscribing to topic to receive notification on current topic
+        FirebaseMessaging.getInstance().subscribeToTopic(TOPIC)
+    }
+
+    private fun sendNotifications(notifications: PushNotification)= CoroutineScope(Dispatchers.IO).launch{
+        try{
+            val response = RetrofitInstance.api.postNotification(notifications)
+            if(response.isSuccessful){
+                Log.d(Helper.TAG, "Response: $response")
+            }else{
+                Log.d(Helper.TAG, "Response: ${response.errorBody()}")
+            }
+        }catch (e: Exception){
+            e.printStackTrace()
+        }
     }
 
     private fun loadAllPost() {
@@ -112,10 +145,8 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         if(!isPostingCompleted) {
             binding.postingMssg.visibility = View.VISIBLE
             GlobalScope.launch(Dispatchers.IO) {
-                var count = 1
                 while (true) {
                     if (isPostingCompleted) {
-                        Log.d(Helper.TAG, "count : $count")
                         withContext(Dispatchers.Main) {
                             binding.postingMssg.visibility = View.GONE
                             Toast.makeText(
@@ -123,14 +154,23 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
                                 "Posted", Toast.LENGTH_SHORT
                             ).show()
                         }
+                        //sending notification when post is uploaded
+                        sendNotifications(PushNotification(getNotificationBody(),TOPIC))
                         break
                     }
-                    count += 1
-                    Log.d(Helper.TAG, "count : $count")
                     delay(500)
                 }
             }
         }
+    }
+
+    private fun getNotificationBody(): Notifications{
+        return Notifications(
+            currentUserName,
+            "$MESSAGE $currentUserName",
+            currentUserProfileUrl,
+            currentUserId
+        )
     }
 
     override fun onStop() {

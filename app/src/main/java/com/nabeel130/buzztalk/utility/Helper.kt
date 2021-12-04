@@ -14,6 +14,15 @@ class Helper {
 
         const val TAG = "BuzzReport"
 
+        const val BASE_URL = "https://fcm.googleapis.com"
+        const val SERVER_KEY = "AAAAPvL38mg:APA91bHPLAUmJhCTPXKr2O84BmBUnJuJQPG6yRaNhZktXgomLcQjFcvvCFC73xbGgjoHMrL59KfKwiNMZLyjAKNsLsK8fwTcfk4HjHy15LkaR7P0AYHNaOBC9gBiQPgPARfVUW1QvGwv"
+        const val CONTENT_TYPE = "application/json"
+
+        //notification body
+        const val TITLE = "BuzzTalk"
+        const val MESSAGE = "See new post from"
+        const val TOPIC = "/topics/globalPost"
+
         val PERMISSIONS_STORAGE_CAMERA = arrayOf(
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.CAMERA

@@ -13,6 +13,10 @@ class Helper {
     companion object {
 
         const val TAG = "BuzzReport"
+        const val PREF_KEY = "BuzzTalkKey"
+
+        //user detail
+        const val USER_NAME = "UserName"
 
         const val BASE_URL = "https://fcm.googleapis.com"
         const val SERVER_KEY = "AAAAPvL38mg:APA91bHPLAUmJhCTPXKr2O84BmBUnJuJQPG6yRaNhZktXgomLcQjFcvvCFC73xbGgjoHMrL59KfKwiNMZLyjAKNsLsK8fwTcfk4HjHy15LkaR7P0AYHNaOBC9gBiQPgPARfVUW1QvGwv"

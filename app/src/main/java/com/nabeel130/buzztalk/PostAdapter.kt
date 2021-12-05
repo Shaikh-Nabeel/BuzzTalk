@@ -8,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
@@ -44,6 +46,22 @@ class PostAdapter(options: FirestoreRecyclerOptions<Post>, private val listener:
         val optionBtn: ImageView = view.findViewById(R.id.postOptionMenu)
         val postImage: ImageView = view.findViewById(R.id.postImage)
     }
+
+//    private val differCallback = object : DiffUtil.ItemCallback<Post>(){
+//        override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
+//            return oldItem.createdAt == newItem.createdAt && oldItem.postText == newItem.postText
+//        }
+//
+//        override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean {
+//            return oldItem == newItem
+//        }
+//    }
+//
+//    val differ = AsyncListDiffer(this,differCallback)
+
+//    override fun getItemCount(): Int {
+//        return super.getItemCount()
+//    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val viewHolder =  PostViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_item,parent,false))

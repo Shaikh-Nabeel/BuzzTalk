@@ -20,11 +20,13 @@ import com.nabeel130.buzztalk.daos.PostDao
 import com.nabeel130.buzztalk.daos.UserDao
 import com.nabeel130.buzztalk.daos.UserPostDao
 import com.nabeel130.buzztalk.databinding.FragmentProfileBinding
+import com.nabeel130.buzztalk.models.Post
 import com.nabeel130.buzztalk.models.User
 import com.nabeel130.buzztalk.models.UserPost
 import com.nabeel130.buzztalk.utility.Helper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment(), IProfileAdapter {
@@ -88,7 +90,13 @@ class ProfileFragment : Fragment(), IProfileAdapter {
                     }else {
                         userPost.listOfPosts.reversed() as ArrayList
                     }
+
+                    val listOfPost = GlobalScope.async(Dispatchers.IO){
+                        loadPost(list)
+                    }
+
                     profileAdapter = ProfileAdapter(list, this@ProfileFragment)
+//                    profileAdapter.differ.submitList(list)
                     binding.recyclerViewForProfile.adapter = profileAdapter
                     binding.recyclerViewForProfile.layoutManager = LinearLayoutManager(context)
                     Log.d(Helper.TAG, "Loading successful for post list")
@@ -97,6 +105,18 @@ class ProfileFragment : Fragment(), IProfileAdapter {
             }
         }
         postDao = PostDao()
+    }
+
+    private suspend fun loadPost(list: ArrayList<String>): ArrayList<Post>{
+        val listOfPost = ArrayList<Post>()
+        for(id in list){
+            postDao.getPostById(id).addOnCompleteListener {
+                if(!it.isSuccessful) return@addOnCompleteListener
+                val post = it.result.toObject(Post::class.java)!!
+                listOfPost.add(post)
+            }
+        }
+        return listOfPost
     }
 
     override fun onDestroyView() {

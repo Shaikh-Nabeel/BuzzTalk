@@ -26,16 +26,13 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import com.nabeel130.buzztalk.daos.PostDao
-import com.nabeel130.buzztalk.daos.UserDao
 import com.nabeel130.buzztalk.databinding.ActivityMainBinding
 import com.nabeel130.buzztalk.fragments.ProfileFragment
 import com.nabeel130.buzztalk.models.Post
-import com.nabeel130.buzztalk.models.User
 import com.nabeel130.buzztalk.notifications.Notifications
 import com.nabeel130.buzztalk.notifications.PushNotification
 import com.nabeel130.buzztalk.utility.Helper
 import com.nabeel130.buzztalk.utility.Helper.Companion.MESSAGE
-import com.nabeel130.buzztalk.utility.Helper.Companion.TITLE
 import com.nabeel130.buzztalk.utility.Helper.Companion.TOPIC
 import com.nabeel130.buzztalk.utility.RetrofitInstance
 import kotlinx.coroutines.*
@@ -46,7 +43,6 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: PostAdapter
     private lateinit var postDao: PostDao
-    private lateinit var userDao: UserDao
     private lateinit var likeAdapter: LikeAdapter
     private lateinit var toggle: ActionBarDrawerToggle
 
@@ -85,23 +81,30 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         val profile: ImageView = view.findViewById(R.id.profilePicForMenuBar)
         val userName: TextView = view.findViewById(R.id.userNameForMenuBar)
 
-        userDao = UserDao()
-        GlobalScope.launch(Dispatchers.IO){
-            val userId = Firebase.auth.currentUser?.uid!!
-            userDao.getUserById(userId).addOnCompleteListener {
-                if(it.isSuccessful){
-                    val user = it.result.toObject(User::class.java)
-                    if (user != null) {
-                        userName.text = user.userName
-                        //storing username and uid for sending notification
-                        currentUserName = user.userName!!
-                        currentUserId = user.uid
-                        currentUserProfileUrl = user.imageUrl ?: ""
-                        Glide.with(applicationContext).load(user.imageUrl).circleCrop().into(profile)
-                    }
-                }
-            }
-        }
+//        userDao = UserDao()
+//        GlobalScope.launch(Dispatchers.IO){
+//            val userId = Firebase.auth.currentUser?.uid!!
+//            userDao.getUserById(userId).addOnCompleteListener {
+//                if(it.isSuccessful){
+//                    val user = it.result.toObject(User::class.java)
+//                    if (user != null) {
+//                        userName.text = user.userName
+//                        //storing username and uid for sending notification
+//                        currentUserName = user.userName!!
+//                        currentUserId = user.uid
+//                        currentUserProfileUrl = user.imageUrl ?: ""
+//                        Glide.with(applicationContext).load(user.imageUrl).circleCrop().into(profile)
+//                    }
+//                }
+//            }
+
+            val user = Firebase.auth.currentUser!!
+            userName.text = user.displayName
+            currentUserId = user.uid
+            currentUserName = user.displayName ?: ""
+            currentUserProfileUrl = user.photoUrl.toString()
+            Glide.with(applicationContext).load(user.photoUrl).circleCrop().into(profile)
+//        }
 
         binding.createPostBtn.setOnClickListener {
             startActivity(Intent(this,CreatePostActivity::class.java))
@@ -303,7 +306,7 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
     private val authStateListener = FirebaseAuth.AuthStateListener{
         if(it.currentUser ==  null){
             val intent = Intent(this,SignInActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
             finish()
         }

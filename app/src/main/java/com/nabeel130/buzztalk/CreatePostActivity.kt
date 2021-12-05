@@ -22,9 +22,12 @@ import com.google.firebase.storage.FirebaseStorage
 import com.nabeel130.buzztalk.daos.PostDao
 import com.nabeel130.buzztalk.databinding.ActivityCreatePostBinding
 import com.nabeel130.buzztalk.utility.Helper
+import com.nabeel130.buzztalk.utility.Helper.Companion.TAG
+import id.zelory.compressor.Compressor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -35,7 +38,9 @@ class CreatePostActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCreatePostBinding
     private var mUri: Uri? = null
     private var isImageSelected = false
+    private var isImageFromCamera = false
     private val postDao = PostDao()
+    private var currentFile: File? = null
 
     override fun onBackPressed() {
         super.onBackPressed()
@@ -64,6 +69,18 @@ class CreatePostActivity : AppCompatActivity() {
                 if(isImageSelected) {
                     isImageSelected = !isImageSelected
                     uuid = UUID.randomUUID().toString()
+
+                    runBlocking {
+                        val compressedImg = Compressor.compress(applicationContext, currentFile!!)
+                        Log.d(TAG,  "Compression successful")
+
+                        mUri = if(isImageFromCamera) {
+                            Uri.fromFile(compressedImg)
+                        }else{
+                            Uri.fromFile(compressedImg)
+                        }
+                    }
+
                     uploadImage(text,mUri!!, uuid)
                 }else{
                     postDao.addPost(text,uuid)
@@ -91,13 +108,14 @@ class CreatePostActivity : AppCompatActivity() {
                     "com.snabeel130.buzztalk.fileprovider",
                     currentImageFile
                 )
+                currentFile = currentImageFile
                 val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, mUri)
                 camLauncher.launch(intent)
             } catch (e: IOException) {
                 e.printStackTrace()
             }
-        }
+        }else verifyStoragePermissions(this)
     }
 
     private fun openGallery(){
@@ -106,7 +124,7 @@ class CreatePostActivity : AppCompatActivity() {
             val intent = Intent(Intent.ACTION_PICK)
             intent.type = "image/*"
             galleryLauncher.launch(intent)
-        }
+        }else verifyStoragePermissions(this)
     }
 
     private var camLauncher = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
@@ -119,8 +137,9 @@ class CreatePostActivity : AppCompatActivity() {
             binding.imageViewPost.visibility = View.VISIBLE
             Glide.with(binding.imageViewPost.context).load(mUri).into(binding.imageViewPost)
             isImageSelected = true
+            isImageFromCamera = true
         } catch (e: IOException) {
-            Log.d(Helper.TAG, "IOException : " + e.message)
+            Log.d(TAG, "IOException : " + e.message)
             e.printStackTrace()
         }
     }
@@ -132,7 +151,9 @@ class CreatePostActivity : AppCompatActivity() {
             if(mUri != null) {
                 binding.imageViewPost.visibility = View.VISIBLE
                 Glide.with(this).load(mUri).into(binding.imageViewPost)
+                getFileFromMediaStore(mUri!!)
                 isImageSelected = true
+                isImageFromCamera = false
             }else{
                 Toast.makeText(
                     applicationContext,
@@ -143,6 +164,22 @@ class CreatePostActivity : AppCompatActivity() {
         }
     }
 
+    private fun getFileFromMediaStore(uri: Uri){
+        val cursor = contentResolver.query(uri, arrayOf(MediaStore.Images.Media.DATA),null,null,null)
+
+        if(cursor != null){
+            if(cursor.moveToFirst()){
+                val filePath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA))
+                currentFile = File(filePath)
+                Log.d(TAG, "Got file path")
+            }else{
+                Log.d(TAG, "Could not find file")
+            }
+        }
+        cursor?.close()
+    }
+
+
     private fun uploadImage(text: String, uri: Uri, uuid: String){
         MainActivity.isPostingCompleted = false
         GlobalScope.launch(Dispatchers.IO) {
@@ -151,14 +188,14 @@ class CreatePostActivity : AppCompatActivity() {
 
             ref.putFile(uri).addOnCompleteListener {
                 if (it.isSuccessful) {
-                    Log.d(Helper.TAG, "Image uploaded")
+                    Log.d(TAG, "Image uploaded")
                     postDao.addPost(text,uuid)
                     MainActivity.isPostingCompleted = true
                 }
             }.addOnProgressListener {
                 val progress = (100.0 * it.bytesTransferred / it.totalByteCount)
                 val percent = progress.toInt()
-                Log.d(Helper.TAG, "$percent%")
+                Log.d(TAG, "$percent%")
             }
         }
     }
@@ -172,10 +209,10 @@ class CreatePostActivity : AppCompatActivity() {
         val readStoragePermission = ActivityCompat.checkSelfPermission(
             activity,Manifest.permission.READ_EXTERNAL_STORAGE)
 
-        Log.d(Helper.TAG, "$cameraPermission -- $readStoragePermission")
+        Log.d(TAG, "$cameraPermission -- $readStoragePermission")
         if (cameraPermission != PackageManager.PERMISSION_GRANTED
             || readStoragePermission != PackageManager.PERMISSION_GRANTED) {
-                Log.d(Helper.TAG, "sending intent..")
+                Log.d(TAG, "sending intent..")
             ActivityCompat.requestPermissions(
                 activity,
                 Helper.PERMISSIONS_STORAGE_CAMERA,

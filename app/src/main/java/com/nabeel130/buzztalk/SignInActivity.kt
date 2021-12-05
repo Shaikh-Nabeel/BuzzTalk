@@ -2,15 +2,13 @@ package com.nabeel130.buzztalk
 
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.Settings
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.browser.customtabs.CustomTabsIntent
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -24,6 +22,8 @@ import com.google.firebase.ktx.Firebase
 import com.nabeel130.buzztalk.daos.UserDao
 import com.nabeel130.buzztalk.databinding.ActivitySignInBinding
 import com.nabeel130.buzztalk.models.User
+import com.nabeel130.buzztalk.utility.Helper.Companion.PREF_KEY
+import com.nabeel130.buzztalk.utility.Helper.Companion.USER_NAME
 
 class SignInActivity : AppCompatActivity() {
 
@@ -36,12 +36,14 @@ class SignInActivity : AppCompatActivity() {
         binding = ActivitySignInBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        auth = Firebase.auth
+        updateUI(auth.currentUser)
+
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken("270364308072-f87u344doh6a96otasu8n8o5grcjmk7i.apps.googleusercontent.com")
             .requestEmail()
             .build()
 
-        auth = Firebase.auth
         googleSignInClient = GoogleSignIn.getClient(this,gso)
         binding.googleSignInBtn.setOnClickListener {
             if(binding.checkBoxforPrivacy.isChecked) {
@@ -59,12 +61,13 @@ class SignInActivity : AppCompatActivity() {
             val builder = CustomTabsIntent.Builder().build()
             builder.launchUrl(this, Uri.parse(getString(R.string.privacy_policy_link)))
         }
+        
     }
 
-    override fun onStart() {
-        super.onStart()
-        updateUI(auth.currentUser)
-    }
+//    override fun onStart() {
+//        super.onStart()
+//
+//    }
 
     private val launcher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -88,12 +91,18 @@ class SignInActivity : AppCompatActivity() {
         auth.signInWithCredential(credential).addOnCompleteListener(this) {
             if (it.isSuccessful) {
                 val user = auth.currentUser
+//                val pref = getPreferences().edit()
+//                pref.putString(USER_NAME, user?.displayName)
                 updateUI(user)
             } else {
                 Toast.makeText(applicationContext, "Couldn't sign in!", Toast.LENGTH_SHORT).show()
             }
         }
     }
+
+//    private fun getPreferences():SharedPreferences{
+//        return applicationContext.getSharedPreferences(PREF_KEY, MODE_PRIVATE)
+//    }
 
     private fun updateUI(user: FirebaseUser?) {
         if(user != null){

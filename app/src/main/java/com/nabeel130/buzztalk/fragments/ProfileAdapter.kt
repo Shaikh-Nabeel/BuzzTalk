@@ -1,7 +1,6 @@
 package com.nabeel130.buzztalk.fragments
 
 import android.annotation.SuppressLint
-import android.graphics.drawable.Drawable
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -11,10 +10,6 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.ToggleButton
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.nabeel130.buzztalk.R
@@ -28,7 +23,6 @@ import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 private var postDao = PostDao()
 val auth = Firebase.auth
@@ -45,6 +39,18 @@ class ProfileAdapter(private val listOfPost: ArrayList<String>, private val list
         val optionBtn: ImageView = view.findViewById(R.id.postOptionMenuFragment)
         val postImage: ImageView = view.findViewById(R.id.postImage_Profile)
     }
+
+//    private val differCallback = object : DiffUtil.ItemCallback<String>(){
+//        override fun areItemsTheSame(oldItem: String, newItem: String): Boolean {
+//            return oldItem.contentEquals(newItem)
+//        }
+//
+//        override fun areContentsTheSame(oldItem: String, newItem: String): Boolean {
+//            return oldItem == newItem
+//        }
+//    }
+//
+//    val differ = AsyncListDiffer(this,differCallback)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProfileViewHolder {
         val viewHolder = ProfileViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_profile_adapter,parent,false))
@@ -97,6 +103,7 @@ class ProfileAdapter(private val listOfPost: ArrayList<String>, private val list
                             when (item.itemId) {
                                 R.id.deletePost -> {
                                     listener.onDeletePostClicked(listOfPost[position],holder.adapterPosition)
+//                                    differ.currentList.removeAt(position)
                                     listOfPost.removeAt(position)
                                     true
                                 }

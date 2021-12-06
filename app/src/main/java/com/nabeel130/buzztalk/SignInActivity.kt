@@ -37,7 +37,6 @@ class SignInActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         auth = Firebase.auth
-        updateUI(auth.currentUser)
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken("270364308072-f87u344doh6a96otasu8n8o5grcjmk7i.apps.googleusercontent.com")
@@ -45,6 +44,7 @@ class SignInActivity : AppCompatActivity() {
             .build()
 
         googleSignInClient = GoogleSignIn.getClient(this,gso)
+//        updateUI(auth.currentUser)
         binding.googleSignInBtn.setOnClickListener {
             if(binding.checkBoxforPrivacy.isChecked) {
                 signIn()

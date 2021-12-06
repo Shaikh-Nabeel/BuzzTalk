@@ -9,6 +9,8 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.ToggleButton
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -17,18 +19,15 @@ import com.nabeel130.buzztalk.daos.PostDao
 import com.nabeel130.buzztalk.models.Post
 import com.nabeel130.buzztalk.storageRef
 import com.nabeel130.buzztalk.utility.GlideApp
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-private var postDao = PostDao()
 val auth = Firebase.auth
 val uid = auth.currentUser!!.uid
 
-class ProfileAdapter(private val listOfPost: ArrayList<String>, private val listener: IProfileAdapter) :
+class ProfileAdapter(private val listOfId: ArrayList<String>,
+                     private val listener: IProfileAdapter) :
     RecyclerView.Adapter<ProfileAdapter.ProfileViewHolder>() {
 
     class ProfileViewHolder(view: View): RecyclerView.ViewHolder(view){
@@ -40,32 +39,32 @@ class ProfileAdapter(private val listOfPost: ArrayList<String>, private val list
         val postImage: ImageView = view.findViewById(R.id.postImage_Profile)
     }
 
-//    private val differCallback = object : DiffUtil.ItemCallback<String>(){
-//        override fun areItemsTheSame(oldItem: String, newItem: String): Boolean {
-//            return oldItem.contentEquals(newItem)
-//        }
-//
-//        override fun areContentsTheSame(oldItem: String, newItem: String): Boolean {
-//            return oldItem == newItem
-//        }
-//    }
-//
-//    val differ = AsyncListDiffer(this,differCallback)
+    private val differCallback = object : DiffUtil.ItemCallback<Post>(){
+        override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
+            return oldItem.createdAt == newItem.createdAt && oldItem.postText == newItem.postText
+        }
+
+        override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean {
+            return oldItem.likedBy.size == newItem.likedBy.size
+        }
+    }
+
+    val differ = AsyncListDiffer(this,differCallback)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProfileViewHolder {
         val viewHolder = ProfileViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_profile_adapter,parent,false))
         viewHolder.likeBtn.setOnClickListener {
-            listener.onPostLiked(listOfPost[viewHolder.adapterPosition],viewHolder.adapterPosition)
+            listener.onPostLiked(listOfId[viewHolder.adapterPosition],viewHolder.adapterPosition)
         }
         return viewHolder
     }
 
     @SuppressLint("SimpleDateFormat", "SetTextI18n")
     override fun onBindViewHolder(holder: ProfileViewHolder, position: Int) {
-        GlobalScope.launch(Dispatchers.IO) {
-            postDao.getPostById(listOfPost[position]).addOnCompleteListener {
-                if(it.isSuccessful){
-                    val model = it.result.toObject(Post::class.java)!!
+//        GlobalScope.launch(Dispatchers.IO) {
+//            postDao.getPostById(listOfPost[position]).addOnCompleteListener {
+//                if(it.isSuccessful){
+                    val model = differ.currentList[position]
 
                     val dateFormat: DateFormat = SimpleDateFormat("MMM dd, yyyy h:mm a")
                     val calendar = Calendar.getInstance()
@@ -102,9 +101,10 @@ class ProfileAdapter(private val listOfPost: ArrayList<String>, private val list
                         menu.setOnMenuItemClickListener { item ->
                             when (item.itemId) {
                                 R.id.deletePost -> {
-                                    listener.onDeletePostClicked(listOfPost[position],holder.adapterPosition)
+                                    listener.onDeletePostClicked(listOfId[position],holder.adapterPosition)
 //                                    differ.currentList.removeAt(position)
-                                    listOfPost.removeAt(position)
+                                    differ.currentList.removeAt(position)
+                                    listOfId.removeAt(position)
                                     true
                                 }
                                 R.id.sharePost -> {
@@ -118,14 +118,14 @@ class ProfileAdapter(private val listOfPost: ArrayList<String>, private val list
                         menu.show()
                     }
 
-                }
-            }
-        }
+//                }
+//            }
+//        }
 
     }
 
     override fun getItemCount(): Int {
-        return listOfPost.size
+        return differ.currentList.size
     }
 }
 

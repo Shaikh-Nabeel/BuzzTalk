@@ -24,10 +24,9 @@ import com.nabeel130.buzztalk.models.Post
 import com.nabeel130.buzztalk.models.User
 import com.nabeel130.buzztalk.models.UserPost
 import com.nabeel130.buzztalk.utility.Helper
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import com.nabeel130.buzztalk.utility.Helper.Companion.TAG
+import kotlinx.coroutines.*
+import kotlinx.coroutines.tasks.await
 
 class ProfileFragment : Fragment(), IProfileAdapter {
 
@@ -36,6 +35,7 @@ class ProfileFragment : Fragment(), IProfileAdapter {
     private lateinit var userDao: UserDao
     private lateinit var profileAdapter: ProfileAdapter
     private lateinit var postDao: PostDao
+    private var listOfPost: Deferred<ArrayList<Post>>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,7 +50,7 @@ class ProfileFragment : Fragment(), IProfileAdapter {
         super.onViewCreated(view, savedInstanceState)
         //setting up profile pic and username
 //        binding.progressBarForProfile.visibility = View.VISIBLE
-        Log.d(Helper.TAG, "Loading user details")
+        Log.d(TAG, "Loading user details")
         userDao = UserDao()
         GlobalScope.launch(Dispatchers.IO){
             val userId = Firebase.auth.currentUser?.uid!!
@@ -62,7 +62,7 @@ class ProfileFragment : Fragment(), IProfileAdapter {
                         Glide.with(binding.profilePicForFragments.context).load(user.imageUrl)
                             .circleCrop().into(binding.profilePicForFragments)
 //                        binding.progressBarForProfile.visibility = View.GONE
-                        Log.d(Helper.TAG, "Loading successful")
+                        Log.d(TAG, "Loading successful")
                     }
                 }
             }
@@ -77,13 +77,14 @@ class ProfileFragment : Fragment(), IProfileAdapter {
 //        }
 
         //fetching all post id of post, posted by current user
-        Log.d(Helper.TAG, "Loading post list..")
+        Log.d(TAG, "Loading post list..")
         val userPostDao = UserPostDao()
         GlobalScope.launch(Dispatchers.IO){
             userPostDao.getUserPost().addOnCompleteListener {
                 if(it.isSuccessful){
                     val userPost = it.result.toObject(UserPost::class.java)!!
                     binding.numberOfPost.text = "${userPost.listOfPosts.size}\nPosts"
+
                     //reversing list to sort post according to date (descending order)
                     val list = if(userPost.listOfPosts.size <= 1){
                         userPost.listOfPosts
@@ -91,30 +92,32 @@ class ProfileFragment : Fragment(), IProfileAdapter {
                         userPost.listOfPosts.reversed() as ArrayList
                     }
 
-                    val listOfPost = GlobalScope.async(Dispatchers.IO){
+                    listOfPost = GlobalScope.async(Dispatchers.IO){
                         loadPost(list)
                     }
 
-                    profileAdapter = ProfileAdapter(list, this@ProfileFragment)
-//                    profileAdapter.differ.submitList(list)
-                    binding.recyclerViewForProfile.adapter = profileAdapter
-                    binding.recyclerViewForProfile.layoutManager = LinearLayoutManager(context)
-                    Log.d(Helper.TAG, "Loading successful for post list")
-
+                    GlobalScope.launch(Dispatchers.Main) {
+                        profileAdapter = ProfileAdapter(list,this@ProfileFragment)
+                        binding.recyclerViewForProfile.adapter = profileAdapter
+                        binding.recyclerViewForProfile.layoutManager = LinearLayoutManager(context)
+                        profileAdapter.differ.submitList(listOfPost?.await())
+                        Log.d(TAG, "Loading successful for post list")
+                    }
                 }
             }
         }
         postDao = PostDao()
     }
 
-    private suspend fun loadPost(list: ArrayList<String>): ArrayList<Post>{
+    private fun loadPost(list: ArrayList<String>): ArrayList<Post>{
         val listOfPost = ArrayList<Post>()
         for(id in list){
-            postDao.getPostById(id).addOnCompleteListener {
-                if(!it.isSuccessful) return@addOnCompleteListener
-                val post = it.result.toObject(Post::class.java)!!
+            runBlocking {
+                val post = postDao.getPostById(id).await().toObject(Post::class.java)!!
                 listOfPost.add(post)
+                Log.d(TAG, post.postText)
             }
+            Log.d(TAG, id)
         }
         return listOfPost
     }
@@ -130,7 +133,19 @@ class ProfileFragment : Fragment(), IProfileAdapter {
             postDao.likedPost(postId)
                 .addOnCompleteListener {
                 if (it.isSuccessful) {
-                    profileAdapter.notifyItemChanged(position)
+                    postDao.getPostById(postId).addOnCompleteListener { post ->
+                        if(post.isSuccessful){
+                            val updatedPost = post.result.toObject(Post::class.java)!!
+                            GlobalScope.launch(Dispatchers.IO) {
+                                val newList = ArrayList(listOfPost?.await()!!.toMutableList())
+                                newList[position] = updatedPost
+                                withContext(Dispatchers.Main) {
+//                                    profileAdapter.notifyItemChanged(position)
+                                    profileAdapter.differ.submitList(newList)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -179,7 +179,6 @@ class CreatePostActivity : AppCompatActivity() {
         cursor?.close()
     }
 
-
     private fun uploadImage(text: String, uri: Uri, uuid: String){
         MainActivity.isPostingCompleted = false
         GlobalScope.launch(Dispatchers.IO) {

@@ -2,17 +2,13 @@ package com.nabeel130.buzztalk
 
 import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.recyclerview.widget.AsyncListDiffer
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
@@ -24,7 +20,6 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.nabeel130.buzztalk.models.Post
 import com.nabeel130.buzztalk.utility.GlideApp
-import com.nabeel130.buzztalk.utility.Helper
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -46,22 +41,6 @@ class PostAdapter(options: FirestoreRecyclerOptions<Post>, private val listener:
         val optionBtn: ImageView = view.findViewById(R.id.postOptionMenu)
         val postImage: ImageView = view.findViewById(R.id.postImage)
     }
-
-//    private val differCallback = object : DiffUtil.ItemCallback<Post>(){
-//        override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
-//            return oldItem.createdAt == newItem.createdAt && oldItem.postText == newItem.postText
-//        }
-//
-//        override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean {
-//            return oldItem == newItem
-//        }
-//    }
-//
-//    val differ = AsyncListDiffer(this,differCallback)
-
-//    override fun getItemCount(): Int {
-//        return super.getItemCount()
-//    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val viewHolder =  PostViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_item,parent,false))

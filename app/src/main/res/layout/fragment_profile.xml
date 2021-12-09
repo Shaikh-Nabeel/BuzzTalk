@@ -83,6 +83,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/viewDividerForProfile"
-        tools:listitem="@layout/item_profile_adapter" />
+        tools:listitem="@layout/item_profile_adapter"
+        android:descendantFocusability="blocksDescendants"/>
 
 </androidx.constraintlayout.motion.widget.MotionLayout>

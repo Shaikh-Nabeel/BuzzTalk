@@ -48,33 +48,12 @@ class ProfileFragment : Fragment(), IProfileAdapter {
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //setting up profile pic and username
-//        binding.progressBarForProfile.visibility = View.VISIBLE
-        Log.d(TAG, "Loading user details")
+
         userDao = UserDao()
-        GlobalScope.launch(Dispatchers.IO){
-            val userId = Firebase.auth.currentUser?.uid!!
-            userDao.getUserById(userId).addOnCompleteListener {
-                if (it.isSuccessful) {
-                    val user = it.result.toObject(User::class.java)
-                    if (user != null) {
-                        binding.userNameForFragments.text = user.userName
-                        Glide.with(binding.profilePicForFragments.context).load(user.imageUrl)
-                            .circleCrop().into(binding.profilePicForFragments)
-//                        binding.progressBarForProfile.visibility = View.GONE
-                        Log.d(TAG, "Loading successful")
-                    }
-                }
-            }
-        }
-
-
-//        profileViewModel = ViewModelProvider(this).get(ProfileViewModel::class.java)
-//        profileViewModel.currentUser().let {
-//            binding.userNameForFragments.text = it.userName
-//            Glide.with(binding.profilePicForFragments.context).load(it.imageUrl)
-//                .circleCrop().into(binding.profilePicForFragments)
-//        }
+        val user = Firebase.auth.currentUser!!
+        binding.userNameForFragments.text = user.displayName
+        Glide.with(binding.profilePicForFragments.context).load(user.photoUrl)
+            .circleCrop().into(binding.profilePicForFragments)
 
         //fetching all post id of post, posted by current user
         Log.d(TAG, "Loading post list..")
@@ -82,6 +61,7 @@ class ProfileFragment : Fragment(), IProfileAdapter {
         GlobalScope.launch(Dispatchers.IO){
             userPostDao.getUserPost().addOnCompleteListener {
                 if(it.isSuccessful){
+                    if(!it.result.exists()) return@addOnCompleteListener
                     val userPost = it.result.toObject(UserPost::class.java)!!
                     binding.numberOfPost.text = "${userPost.listOfPosts.size}\nPosts"
 
@@ -116,6 +96,14 @@ class ProfileFragment : Fragment(), IProfileAdapter {
                 val post = postDao.getPostById(id).await().toObject(Post::class.java)!!
                 listOfPost.add(post)
                 Log.d(TAG, post.postText)
+//                postDao.getPostById(id).addOnCompleteListener {
+//                    if(it.isSuccessful){
+//                        Log.d(TAG, "snapshot id: "+ it.result.id)
+//                        val post = it.result.toObject(Post::class.java)!!
+//                        listOfPost.add(post)
+//                        Log.d(TAG, post.postText)
+//                    }
+//                }
             }
             Log.d(TAG, id)
         }
@@ -166,8 +154,7 @@ class ProfileFragment : Fragment(), IProfileAdapter {
                     binding.numberOfPost.text = "${profileAdapter.itemCount}\nPosts"
                     Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
                 }
-                else
-                    Toast.makeText(context, "Couldn't delete", Toast.LENGTH_SHORT).show()
+                else Toast.makeText(context, "Couldn't delete", Toast.LENGTH_SHORT).show()
             }
         }
 

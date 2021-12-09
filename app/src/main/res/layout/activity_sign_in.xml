@@ -31,7 +31,6 @@
         app:layout_constraintTop_toTopOf="parent"
         >
 
-
         <TextView
             android:id="@+id/buzzTextView"
             android:layout_width="wrap_content"
@@ -74,10 +73,9 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/googleSignInBtn"
         app:layout_constraintEnd_toEndOf="parent"
-
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/progressBarLogin"
-        tools:ignore="TextContrastCheck" />
+        tools:ignore="TextContrastCheck,TouchTargetSizeCheck" />
 
     <TextView
         android:id="@+id/learnMoreTxt"

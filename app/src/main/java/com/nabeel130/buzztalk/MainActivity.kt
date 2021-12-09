@@ -16,6 +16,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.bumptech.glide.Glide
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.material.navigation.NavigationView
@@ -81,30 +82,12 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         val profile: ImageView = view.findViewById(R.id.profilePicForMenuBar)
         val userName: TextView = view.findViewById(R.id.userNameForMenuBar)
 
-//        userDao = UserDao()
-//        GlobalScope.launch(Dispatchers.IO){
-//            val userId = Firebase.auth.currentUser?.uid!!
-//            userDao.getUserById(userId).addOnCompleteListener {
-//                if(it.isSuccessful){
-//                    val user = it.result.toObject(User::class.java)
-//                    if (user != null) {
-//                        userName.text = user.userName
-//                        //storing username and uid for sending notification
-//                        currentUserName = user.userName!!
-//                        currentUserId = user.uid
-//                        currentUserProfileUrl = user.imageUrl ?: ""
-//                        Glide.with(applicationContext).load(user.imageUrl).circleCrop().into(profile)
-//                    }
-//                }
-//            }
-
-            val user = Firebase.auth.currentUser!!
-            userName.text = user.displayName
-            currentUserId = user.uid
-            currentUserName = user.displayName ?: ""
-            currentUserProfileUrl = user.photoUrl.toString()
-            Glide.with(applicationContext).load(user.photoUrl).circleCrop().into(profile)
-//        }
+        val user = Firebase.auth.currentUser!!
+        userName.text = user.displayName
+        currentUserId = user.uid
+        currentUserName = user.displayName ?: ""
+        currentUserProfileUrl = user.photoUrl.toString()
+        Glide.with(applicationContext).load(user.photoUrl).circleCrop().into(profile)
 
         binding.createPostBtn.setOnClickListener {
             startActivity(Intent(this,CreatePostActivity::class.java))
@@ -136,6 +119,7 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         val query = postCollection.orderBy("createdAt",Query.Direction.DESCENDING)
         val recyclerViewOption = FirestoreRecyclerOptions.Builder<Post>().setQuery(query,Post::class.java).build()
         adapter = PostAdapter(recyclerViewOption, this)
+        (binding.recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
     }

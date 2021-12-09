@@ -44,7 +44,7 @@ class SignInActivity : AppCompatActivity() {
             .build()
 
         googleSignInClient = GoogleSignIn.getClient(this,gso)
-//        updateUI(auth.currentUser)
+        updateUI(auth.currentUser)
         binding.googleSignInBtn.setOnClickListener {
             if(binding.checkBoxforPrivacy.isChecked) {
                 signIn()

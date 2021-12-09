@@ -57,7 +57,6 @@ class CreatePostActivity : AppCompatActivity() {
         binding.customToolB2.title = getString(R.string.post)
         binding.customToolB2.setTitleTextColor(Color.WHITE)
 
-
         binding.postBtn.setOnClickListener {
             val text = binding.postText.text.toString()
 

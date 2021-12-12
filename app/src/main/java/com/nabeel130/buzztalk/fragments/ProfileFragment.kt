@@ -4,12 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.ktx.auth
@@ -17,11 +17,9 @@ import com.google.firebase.ktx.Firebase
 import com.nabeel130.buzztalk.MainActivity
 import com.nabeel130.buzztalk.R
 import com.nabeel130.buzztalk.daos.PostDao
-import com.nabeel130.buzztalk.daos.UserDao
 import com.nabeel130.buzztalk.daos.UserPostDao
 import com.nabeel130.buzztalk.databinding.FragmentProfileBinding
 import com.nabeel130.buzztalk.models.Post
-import com.nabeel130.buzztalk.models.User
 import com.nabeel130.buzztalk.models.UserPost
 import com.nabeel130.buzztalk.utility.Helper
 import com.nabeel130.buzztalk.utility.Helper.Companion.TAG
@@ -32,10 +30,12 @@ class ProfileFragment : Fragment(), IProfileAdapter {
 
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
-    private lateinit var userDao: UserDao
+//    private lateinit var userDao: UserDao
     private lateinit var profileAdapter: ProfileAdapter
     private lateinit var postDao: PostDao
     private var listOfPost: Deferred<ArrayList<Post>>? = null
+    private lateinit var list: ArrayList<String>
+    private val user = Firebase.auth.currentUser!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,8 +49,7 @@ class ProfileFragment : Fragment(), IProfileAdapter {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        userDao = UserDao()
-        val user = Firebase.auth.currentUser!!
+//        userDao = UserDao()
         binding.userNameForFragments.text = user.displayName
         Glide.with(binding.profilePicForFragments.context).load(user.photoUrl)
             .circleCrop().into(binding.profilePicForFragments)
@@ -66,7 +65,7 @@ class ProfileFragment : Fragment(), IProfileAdapter {
                     binding.numberOfPost.text = "${userPost.listOfPosts.size}\nPosts"
 
                     //reversing list to sort post according to date (descending order)
-                    val list = if(userPost.listOfPosts.size <= 1){
+                    list = if(userPost.listOfPosts.size <= 1){
                         userPost.listOfPosts
                     }else {
                         userPost.listOfPosts.reversed() as ArrayList
@@ -104,6 +103,9 @@ class ProfileFragment : Fragment(), IProfileAdapter {
 //                        Log.d(TAG, post.postText)
 //                    }
 //                }
+                withContext(Dispatchers.Main){
+                    profileAdapter.differ.submitList(listOfPost)
+                }
             }
             Log.d(TAG, id)
         }
@@ -116,27 +118,24 @@ class ProfileFragment : Fragment(), IProfileAdapter {
         MainActivity.getInstance().visibleComponentOfMainActivity()
     }
 
-    override fun onPostLiked(postId: String,position: Int) {
-        GlobalScope.launch(Dispatchers.IO) {
-            postDao.likedPost(postId)
-                .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    postDao.getPostById(postId).addOnCompleteListener { post ->
-                        if(post.isSuccessful){
-                            val updatedPost = post.result.toObject(Post::class.java)!!
-                            GlobalScope.launch(Dispatchers.IO) {
-                                val newList = ArrayList(listOfPost?.await()!!.toMutableList())
-                                newList[position] = updatedPost
-                                withContext(Dispatchers.Main) {
-//                                    profileAdapter.notifyItemChanged(position)
-                                    profileAdapter.differ.submitList(newList)
-                                }
-                            }
-                        }
-                    }
-                }
+    override fun onPostLiked(post: Post,postId: String) {
+
+            val postCopy = post.copy(likedBy = post.likedBy.toMutableList() as ArrayList)
+            val newList = runBlocking {
+                listOfPost?.await()!!.toMutableList() as ArrayList
             }
-        }
+            val likeList = postCopy.likedBy
+            if(likeList.contains(user.uid)) likeList.remove(user.uid) else likeList.add(user.uid)
+
+            postDao.likedPost(postCopy, postId).addOnCompleteListener{
+                if(it.isSuccessful)
+                    Log.d(TAG, "Post like updated, like: "+post.likedBy.size)
+            }
+            Log.d(TAG, "id : ${list.indexOf(postId)} , ${post.likedBy.size}, ${postCopy.likedBy.size}")
+
+            newList[list.indexOf(postId)] = postCopy
+            profileAdapter.differ.submitList(newList)
+
     }
 
     @SuppressLint("SetTextI18n")

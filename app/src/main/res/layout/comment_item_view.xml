@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/border_for_post_text"
+    android:backgroundTint="@color/matt_black"
+    android:layout_margin="1dp"
+    android:padding="10dp">
+
+    <ImageView
+        android:id="@+id/profilePicForComment"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:contentDescription="@string/app_name"
+        tools:background="@drawable/app_icon" />
+
+    <TextView
+        android:id="@+id/userNameForComment"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="0dp"
+        android:layout_toEndOf="@+id/profilePicForComment"
+        android:paddingStart="5dp"
+        android:textColor="@color/white_1"
+        tools:ignore="RtlSymmetry"
+        tools:text="ramesh gutka"
+        android:textSize="14sp"
+        tools:textColor="@color/white_1" />
+
+    <TextView
+        android:id="@+id/dateOfComment"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/userNameForComment"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="0dp"
+        android:layout_toEndOf="@+id/profilePicForComment"
+        android:paddingStart="5dp"
+        android:textColor="@color/white_3"
+        tools:ignore="RtlSymmetry"
+        tools:text="Nov 3 2021 4:30 am"
+        android:textSize="11sp"
+        tools:textColor="@color/white_1" />
+
+    <TextView
+        android:id="@+id/comment"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dateOfComment"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="8dp"
+        android:padding="2dp"
+        android:layout_toEndOf="@id/profilePicForComment"
+        android:background="@drawable/post_text_background"
+        android:paddingStart="5dp"
+        android:textColor="@color/white_1"
+        tools:ignore="RtlSymmetry"
+        tools:text="comment: blah blah blah...hgjkh hfwwakuku fa hfa ahfhf k fkfja j afjf"
+        />
+
+</RelativeLayout>

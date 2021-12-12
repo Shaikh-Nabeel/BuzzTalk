@@ -15,6 +15,7 @@ import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.bumptech.glide.Glide
@@ -28,7 +29,9 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import com.nabeel130.buzztalk.daos.PostDao
 import com.nabeel130.buzztalk.databinding.ActivityMainBinding
+import com.nabeel130.buzztalk.fragments.CommentsFragment
 import com.nabeel130.buzztalk.fragments.ProfileFragment
+import com.nabeel130.buzztalk.models.Comments
 import com.nabeel130.buzztalk.models.Post
 import com.nabeel130.buzztalk.notifications.Notifications
 import com.nabeel130.buzztalk.notifications.PushNotification
@@ -76,6 +79,15 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         toggle = ActionBarDrawerToggle(this,binding.drawableLayout,binding.customToolB,R.string.navigation_open,R.string.navigation_close)
         binding.drawableLayout.addDrawerListener(toggle)
         toggle.syncState()
+        toggle.isDrawerIndicatorEnabled = false
+        toggle.setHomeAsUpIndicator(R.drawable.ic_baseline_menu_24)
+        toggle.setToolbarNavigationClickListener {
+            if(binding.drawableLayout.isDrawerVisible(GravityCompat.START)){
+                binding.drawableLayout.closeDrawer(GravityCompat.START)
+            }else{
+                binding.drawableLayout.openDrawer(GravityCompat.START)
+            }
+        }
         binding.navigationView.setNavigationItemSelectedListener(this)
 
         val view = binding.navigationView.getHeaderView(0)
@@ -98,6 +110,11 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
 
         //subscribing to topic to receive notification on current topic
         FirebaseMessaging.getInstance().subscribeToTopic(TOPIC)
+
+//        val comment = Comments(currentUserId,"delete the fucking post",System.currentTimeMillis())
+//        postDao.postComment("kDpXAEZO5hOl4BJZC2fY",comment)
+
+
     }
 
     private fun sendNotifications(notifications: PushNotification)= CoroutineScope(Dispatchers.IO).launch{
@@ -207,6 +224,20 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         }
     }
 
+    override fun onPostCommentPressed(postId: String) {
+        val bundle = Bundle()
+        bundle.putString("postId", postId)
+        val commentsFragment = CommentsFragment()
+        commentsFragment.arguments = bundle
+        binding.recyclerView.visibility = View.GONE
+        binding.createPostBtn.visibility = View.GONE
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.frameLayoutForFragments,commentsFragment)
+            addToBackStack(null)
+            commit()
+        }
+    }
+
     override fun onDeletePostClicked(postId: String, uuid: String?) {
 
         val dialog = Helper.buildDialogBox(this,getString(R.string.areYouSure),getString(R.string.dialog_text_1))
@@ -253,9 +284,9 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        binding.drawableLayout.closeDrawer(binding.navigationView)
         return when (item.itemId) {
             R.id.profileDetails -> {
-                binding.drawableLayout.closeDrawer(binding.navigationView)
                 if(binding.recyclerView.visibility == View.GONE)
                     return true
                 val profileFragment = ProfileFragment()
@@ -271,12 +302,10 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
             R.id.privacyPolicy -> {
                 val builder = CustomTabsIntent.Builder().build()
                 builder.launchUrl(this, Uri.parse(getString(R.string.privacy_policy_link)))
-                binding.drawableLayout.closeDrawer(binding.navigationView)
                 true
             }
             R.id.logOutBtn -> {
                 singOut()
-                binding.drawableLayout.closeDrawer(binding.navigationView)
                 true
             }
             R.id.shareApp -> {
@@ -290,7 +319,7 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
     private val authStateListener = FirebaseAuth.AuthStateListener{
         if(it.currentUser ==  null){
             val intent = Intent(this,SignInActivity::class.java)
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             finish()
         }

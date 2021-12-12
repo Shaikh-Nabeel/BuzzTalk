@@ -37,6 +37,8 @@
             android:layout_alignParentEnd="true"
             android:background="@color/matt_black"
             android:maxHeight="?attr/actionBarSize"
+            app:navigationIcon="@drawable/ic_baseline_person_24"
+
             />
 
         <FrameLayout

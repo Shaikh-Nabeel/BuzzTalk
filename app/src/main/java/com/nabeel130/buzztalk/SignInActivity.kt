@@ -2,7 +2,6 @@ package com.nabeel130.buzztalk
 
 import android.app.Activity
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -22,8 +21,6 @@ import com.google.firebase.ktx.Firebase
 import com.nabeel130.buzztalk.daos.UserDao
 import com.nabeel130.buzztalk.databinding.ActivitySignInBinding
 import com.nabeel130.buzztalk.models.User
-import com.nabeel130.buzztalk.utility.Helper.Companion.PREF_KEY
-import com.nabeel130.buzztalk.utility.Helper.Companion.USER_NAME
 
 class SignInActivity : AppCompatActivity() {
 
@@ -64,10 +61,6 @@ class SignInActivity : AppCompatActivity() {
         
     }
 
-//    override fun onStart() {
-//        super.onStart()
-//
-//    }
 
     private val launcher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -91,18 +84,12 @@ class SignInActivity : AppCompatActivity() {
         auth.signInWithCredential(credential).addOnCompleteListener(this) {
             if (it.isSuccessful) {
                 val user = auth.currentUser
-//                val pref = getPreferences().edit()
-//                pref.putString(USER_NAME, user?.displayName)
                 updateUI(user)
             } else {
                 Toast.makeText(applicationContext, "Couldn't sign in!", Toast.LENGTH_SHORT).show()
             }
         }
     }
-
-//    private fun getPreferences():SharedPreferences{
-//        return applicationContext.getSharedPreferences(PREF_KEY, MODE_PRIVATE)
-//    }
 
     private fun updateUI(user: FirebaseUser?) {
         if(user != null){

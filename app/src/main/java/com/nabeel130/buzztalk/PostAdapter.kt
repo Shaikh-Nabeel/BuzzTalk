@@ -40,16 +40,29 @@ class PostAdapter(options: FirestoreRecyclerOptions<Post>, private val listener:
         val progress: ProgressBar = view.findViewById(R.id.progressBarForImage)
         val optionBtn: ImageView = view.findViewById(R.id.postOptionMenu)
         val postImage: ImageView = view.findViewById(R.id.postImage)
+        val commentBtn: ImageView = view.findViewById(R.id.commentBtn)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
-        val viewHolder =  PostViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_item,parent,false))
+        val viewHolder =  PostViewHolder(
+            LayoutInflater.from(parent.context)
+                .inflate(
+                    R.layout.recycler_view_item,
+                    parent,
+                    false
+                )
+        )
+
         viewHolder.likeBtn.setOnClickListener {
             listener.onPostLiked(snapshots.getSnapshot(viewHolder.adapterPosition).id)
         }
 
         viewHolder.likeCount.setOnClickListener {
             listener.onLikeCountClicked(snapshots.getSnapshot(viewHolder.adapterPosition).id)
+        }
+
+        viewHolder.commentBtn.setOnClickListener {
+            listener.onPostCommentPressed(snapshots.getSnapshot(viewHolder.adapterPosition).id)
         }
 
         return viewHolder
@@ -139,4 +152,5 @@ interface IPostAdapter{
     fun onLikeCountClicked(postId: String)
     fun onDeletePostClicked(postId: String, uuid: String?)
     fun onShareClicked(text: String, userName: String)
+    fun onPostCommentPressed(postId: String)
 }

@@ -1,6 +1,7 @@
 package com.nabeel130.buzztalk.fragments
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -15,10 +16,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.nabeel130.buzztalk.R
-import com.nabeel130.buzztalk.daos.PostDao
 import com.nabeel130.buzztalk.models.Post
 import com.nabeel130.buzztalk.storageRef
 import com.nabeel130.buzztalk.utility.GlideApp
+import com.nabeel130.buzztalk.utility.Helper.Companion.TAG
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -45,7 +46,7 @@ class ProfileAdapter(private val listOfId: ArrayList<String>,
         }
 
         override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean {
-            return oldItem.likedBy.size == newItem.likedBy.size
+            return oldItem.likedBy.size == newItem.likedBy.size && oldItem == newItem
         }
     }
 
@@ -54,7 +55,8 @@ class ProfileAdapter(private val listOfId: ArrayList<String>,
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProfileViewHolder {
         val viewHolder = ProfileViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_profile_adapter,parent,false))
         viewHolder.likeBtn.setOnClickListener {
-            listener.onPostLiked(listOfId[viewHolder.adapterPosition],viewHolder.adapterPosition)
+            listener.onPostLiked(differ.currentList[viewHolder.adapterPosition], listOfId[viewHolder.adapterPosition])
+            Log.d(TAG, differ.currentList[viewHolder.adapterPosition].postText)
         }
         return viewHolder
     }
@@ -130,7 +132,7 @@ class ProfileAdapter(private val listOfId: ArrayList<String>,
 }
 
 interface IProfileAdapter{
-    fun onPostLiked(postId: String,position: Int)
+    fun onPostLiked(post: Post,postId: String)
     fun onDeletePostClicked(postId: String,position: Int)
     fun onShareClicked(text: String,userName: String)
 }

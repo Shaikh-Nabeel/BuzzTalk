@@ -89,7 +89,7 @@
                     android:layout_height="45dp"
                     android:layout_weight="1"
                     android:contentDescription="@string/app_name"
-                    android:src="@drawable/camera_24"
+                    android:src="@drawable/photo_camera"
                     tools:ignore="DuplicateSpeakableTextCheck,TouchTargetSizeCheck" />
 
                 <ImageView
@@ -99,7 +99,7 @@
                     android:layout_height="45dp"
                     android:layout_weight="1"
                     android:contentDescription="@string/app_name"
-                    android:src="@drawable/gallery_24"
+                    android:src="@drawable/photo_gallery"
                     tools:ignore="TouchTargetSizeCheck" />
 
             </LinearLayout>

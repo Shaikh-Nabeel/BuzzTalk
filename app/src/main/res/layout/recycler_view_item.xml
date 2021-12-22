@@ -14,8 +14,8 @@
         android:layout_marginTop="5dp"
         android:layout_marginEnd="3dp"
         android:layout_marginBottom="5dp"
-        android:backgroundTint="@color/matt_black"
         android:background="@drawable/border_for_post_text"
+        android:backgroundTint="@color/matt_black"
         android:padding="10dp">
 
         <ImageView
@@ -26,7 +26,7 @@
             android:contentDescription="@string/app_name"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:background="@drawable/app_icon" />
+            tools:background="@drawable/user" />
 
         <TextView
             android:id="@+id/userName"
@@ -44,11 +44,11 @@
 
         <ImageView
             android:id="@+id/postOptionMenu"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
-            android:background="@drawable/more"
+            android:background="@drawable/ic_baseline_more_vert_24"
             android:contentDescription="@string/more_btn"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -73,14 +73,13 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:elevation="2dp"
-            app:layout_constraintTop_toTopOf="@+id/linLayoutPost"
-            app:layout_constraintStart_toStartOf="@+id/linLayoutPost"
-            app:layout_constraintBottom_toBottomOf="@+id/linLayoutPost"
-            app:layout_constraintEnd_toEndOf="@id/linLayoutPost"
             android:indeterminate="true"
             android:indeterminateDrawable="@drawable/progress_bar_rotator"
             android:visibility="gone"
-            />
+            app:layout_constraintBottom_toBottomOf="@+id/linLayoutPost"
+            app:layout_constraintEnd_toEndOf="@id/linLayoutPost"
+            app:layout_constraintStart_toStartOf="@+id/linLayoutPost"
+            app:layout_constraintTop_toTopOf="@+id/linLayoutPost" />
 
         <LinearLayout
             android:id="@+id/linLayoutPost"
@@ -103,6 +102,8 @@
                 android:singleLine="false"
                 android:textColor="@color/white_1"
                 android:textSize="16sp"
+                android:textColorLink="@color/line_color"
+                android:autoLink="web|email"
                 tools:text="hey, there it is my first post" />
 
             <ImageView
@@ -112,19 +113,22 @@
                 android:layout_gravity="center"
                 android:contentDescription="@string/post"
                 android:padding="1dp"
+                android:src="@drawable/user"
                 tools:ignore="ImageContrastCheck" />
         </LinearLayout>
 
         <ToggleButton
             android:id="@+id/likeBtn"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_marginStart="10dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/like_toggle_selector"
             android:text="@string/space"
             android:textOff=""
             android:textOn=""
+            app:layout_constraintEnd_toStartOf="@+id/commentBtn"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/linLayoutPost"
             tools:ignore="TouchTargetSizeCheck" />
@@ -135,28 +139,29 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:padding="6dp"
+            android:fontFamily="@font/poppins_semibold"
+            android:paddingStart="6dp"
+            android:paddingTop="4dp"
             android:textColor="@color/white_1"
             android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@+id/commentBtn"
-            app:layout_constraintStart_toEndOf="@+id/likeBtn"
+            android:textStyle=""
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/commentBtn"
             app:layout_constraintTop_toBottomOf="@+id/linLayoutPost"
             tools:ignore="RtlSymmetry"
             tools:text="23 likes" />
 
         <ImageView
             android:id="@+id/commentBtn"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            app:layout_constraintTop_toBottomOf="@+id/linLayoutPost"
-            android:background="@drawable/img_1"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="10dp"
-            android:contentDescription="@string/app_name" />
+            android:background="@drawable/bubble_chat"
+            android:contentDescription="@string/app_name"
+            app:layout_constraintEnd_toStartOf="@+id/likeCount"
+            app:layout_constraintStart_toEndOf="@+id/likeBtn"
+            app:layout_constraintTop_toBottomOf="@+id/linLayoutPost" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </RelativeLayout>

@@ -27,7 +27,11 @@ class LikeAdapter(private val likedBy: ArrayList<String>) : RecyclerView.Adapter
             if(it.isSuccessful){
                 val user = it.result.toObject(User::class.java)!!
                 holder.userName.text = user.userName
-                Glide.with(holder.userImage.context).load(user.imageUrl).circleCrop().into(holder.userImage)
+                try {
+                    Glide.with(holder.userImage.context).load(user.imageUrl).circleCrop().into(holder.userImage)
+                }catch (e: Exception){
+                    
+                }
             }
         }
     }

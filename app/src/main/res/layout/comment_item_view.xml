@@ -19,7 +19,7 @@
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="5dp"
         android:contentDescription="@string/app_name"
-        tools:background="@drawable/app_icon" />
+        tools:background="@drawable/user" />
 
     <TextView
         android:id="@+id/userNameForComment"
@@ -59,13 +59,14 @@
         android:layout_alignParentEnd="true"
         android:layout_marginStart="0dp"
         android:layout_marginEnd="8dp"
-        android:padding="2dp"
         android:layout_toEndOf="@id/profilePicForComment"
+        android:autoLink="web|email"
         android:background="@drawable/post_text_background"
+        android:padding="2dp"
         android:paddingStart="5dp"
         android:textColor="@color/white_1"
-        tools:ignore="RtlSymmetry"
-        tools:text="comment: blah blah blah...hgjkh hfwwakuku fa hfa ahfhf k fkfja j afjf"
-        />
+        android:textColorLink="@color/line_color"
+        tools:ignore="RtlSymmetry,TouchTargetSizeCheck"
+        tools:text="sleeban@gm.com ..hgjkh hfwwakuku fa hfa ahfhf k fkfja j afjf" />
 
 </RelativeLayout>

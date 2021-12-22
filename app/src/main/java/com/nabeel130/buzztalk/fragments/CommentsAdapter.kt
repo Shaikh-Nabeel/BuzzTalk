@@ -14,7 +14,6 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.nabeel130.buzztalk.R
 import com.nabeel130.buzztalk.daos.UserDao
 import com.nabeel130.buzztalk.models.Comments
-import com.nabeel130.buzztalk.models.Post
 import com.nabeel130.buzztalk.models.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -24,7 +23,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 private val userDao = UserDao()
-class CommentsAdapter() : RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>() {
+class CommentsAdapter(private val listener: ICommentAdapter)
+    : RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>() {
 
     class CommentViewHolder(item: View):RecyclerView.ViewHolder(item){
         val userImage: ImageView = item.findViewById(R.id.profilePicForComment)
@@ -53,7 +53,7 @@ class CommentsAdapter() : RecyclerView.Adapter<CommentsAdapter.CommentViewHolder
     val differ = AsyncListDiffer(this,differCallback)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommentViewHolder {
-        return CommentViewHolder(
+        val commentHolder = CommentViewHolder(
             LayoutInflater.from(parent.context)
                 .inflate(
                     R.layout.comment_item_view,
@@ -61,6 +61,13 @@ class CommentsAdapter() : RecyclerView.Adapter<CommentsAdapter.CommentViewHolder
                     false
                 )
         )
+
+        commentHolder.itemView.setOnLongClickListener {
+            listener.onLongClick(differ.currentList[commentHolder.adapterPosition].id, commentHolder.adapterPosition)
+            return@setOnLongClickListener true
+        }
+
+        return commentHolder
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -88,4 +95,8 @@ class CommentsAdapter() : RecyclerView.Adapter<CommentsAdapter.CommentViewHolder
     override fun getItemCount(): Int {
         return differ.currentList.size
     }
+}
+
+interface ICommentAdapter{
+    fun onLongClick(commentId: String, position: Int)
 }

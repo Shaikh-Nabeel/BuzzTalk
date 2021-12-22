@@ -2,24 +2,26 @@ package com.nabeel130.buzztalk.fragments
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import android.widget.Button
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.ktx.Firebase
 import com.nabeel130.buzztalk.MainActivity
+import com.nabeel130.buzztalk.R
 import com.nabeel130.buzztalk.daos.PostDao
 import com.nabeel130.buzztalk.databinding.FragmentCommentsBinding
 import com.nabeel130.buzztalk.models.Comments
+import com.nabeel130.buzztalk.utility.Helper
 import com.nabeel130.buzztalk.utility.Helper.Companion.TAG
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 
-class CommentsFragment : Fragment() {
+class CommentsFragment : Fragment(), ICommentAdapter {
 
     private var _binding: FragmentCommentsBinding? = null
     private val binding get() = _binding!!
@@ -48,7 +50,7 @@ class CommentsFragment : Fragment() {
         }
         Log.d(TAG, "loading post done......")
 
-        adapter = CommentsAdapter()
+        adapter = CommentsAdapter(this)
         binding.recyclerViewForComments.layoutManager = LinearLayoutManager(context)
         binding.recyclerViewForComments.adapter = adapter
         submitList()
@@ -58,11 +60,9 @@ class CommentsFragment : Fragment() {
     private fun postComment() {
         val comment = binding.commentTextET.text.toString()
         binding.commentTextET.setText("")
-        if(comment.isNotEmpty() || comment.isNotBlank()){
-            val comments = Comments(user.uid,comment,System.currentTimeMillis())
-            postDao.postComment(
-                postId,
-                comments)
+        if(comment.isNotEmpty() && comment.isNotBlank()){
+            val comments = Comments(user.uid,comment.trim(),System.currentTimeMillis())
+            postDao.postComment(postId, comments)
                 .addOnCompleteListener {
                     if(it.isSuccessful) Log.d(TAG, "Comment posted")
                     listOfComment = GlobalScope.async(Dispatchers.IO) {
@@ -74,21 +74,67 @@ class CommentsFragment : Fragment() {
     }
 
     private suspend fun loadComments(): MutableList<DocumentSnapshot> {
-//        return GlobalScope.async(Dispatchers.IO) {
-            return postDao.loadComments(postId).await().documents
-//        }
+        return postDao.loadComments(postId).await().documents
     }
 
     private fun submitList(){
+
         GlobalScope.launch(Dispatchers.Main) {
+            if (listOfComment.await().size > 0 && _binding != null) {
+                binding.commentBg.visibility = View.GONE
+                binding.noCommentT.visibility = View.GONE
+            }else {
+                binding.progressBarComment.visibility = View.INVISIBLE
+                return@launch
+            }
             adapter.differ.submitList(listOfComment.await())
+            binding.noOfComments.text = listOfComment.await().size.toString()
+            binding.progressBarComment.visibility = View.INVISIBLE
         }
+
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        if(Helper.isOpenedFromProfile) return
         MainActivity.getInstance().visibleComponentOfMainActivity()
+    }
+
+    override fun onLongClick(commentId: String, position: Int) {
+        Log.d(TAG, "position: $position, id: $commentId")
+        val dialog = Helper.buildDialogBox(requireContext(),"Are you sure?","Do you want to delete this comment?")
+
+        val confirmBtn: Button = dialog.findViewById(R.id.confirm_button)
+        val denyBtn: Button = dialog.findViewById(R.id.deny_button)
+
+        dialog.window?.attributes?.windowAnimations = android.R.anim.fade_in
+
+        confirmBtn.setOnClickListener {
+            dialog.dismiss()
+            postDao.deleteComment(commentId, postId).addOnCompleteListener {
+                if(!it.isSuccessful) return@addOnCompleteListener
+                val copyOfComment = runBlocking {
+                    listOfComment.await().toMutableList()
+                }
+                GlobalScope.launch(Dispatchers.Main){
+                    listOfComment.await().removeAt(position)
+                }
+                copyOfComment.removeAt(position)
+                if(copyOfComment.size < 1){
+                    binding.commentBg.visibility = View.VISIBLE
+                    binding.noCommentT.visibility = View.VISIBLE
+                }
+                adapter.differ.submitList(copyOfComment)
+                binding.noOfComments.text = copyOfComment.size.toString()
+            }
+        }
+
+        denyBtn.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
 }

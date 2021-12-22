@@ -55,6 +55,7 @@
                     android:inputType="textMultiLine"
                     android:minLines="3"
                     android:padding="10dp"
+                    android:textCursorDrawable="@color/white"
                     android:background="@color/matt_black"
                     android:textColor="@color/white"
                     android:textColorHint="@color/white" />
@@ -113,6 +114,7 @@
                 android:textSize="16sp"
                 android:textColor="@color/white_1"
                 android:textStyle="bold"
+                android:elevation="5dp"
                 android:background="@drawable/border_for_post_text"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

@@ -11,6 +11,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -71,17 +72,19 @@ class ProfileFragment : Fragment(), IProfileAdapter {
                         userPost.listOfPosts.reversed() as ArrayList
                     }
 
-                    listOfPost = GlobalScope.async(Dispatchers.IO){
-                        loadPost(list)
-                    }
-
                     GlobalScope.launch(Dispatchers.Main) {
                         profileAdapter = ProfileAdapter(list,this@ProfileFragment)
                         binding.recyclerViewForProfile.adapter = profileAdapter
                         binding.recyclerViewForProfile.layoutManager = LinearLayoutManager(context)
-                        profileAdapter.differ.submitList(listOfPost?.await())
+                        (binding.recyclerViewForProfile.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+//                        profileAdapter.differ.submitList(listOfPost?.await())
                         Log.d(TAG, "Loading successful for post list")
                     }
+
+                    listOfPost = GlobalScope.async(Dispatchers.IO){
+                        loadPost(list)
+                    }
+
                 }
             }
         }
@@ -94,7 +97,7 @@ class ProfileFragment : Fragment(), IProfileAdapter {
             runBlocking {
                 val post = postDao.getPostById(id).await().toObject(Post::class.java)!!
                 listOfPost.add(post)
-                Log.d(TAG, post.postText)
+                Log.d(TAG, "id: ${post.createdBy.uid} = ${post.postText}")
 //                postDao.getPostById(id).addOnCompleteListener {
 //                    if(it.isSuccessful){
 //                        Log.d(TAG, "snapshot id: "+ it.result.id)
@@ -104,7 +107,7 @@ class ProfileFragment : Fragment(), IProfileAdapter {
 //                    }
 //                }
                 withContext(Dispatchers.Main){
-                    profileAdapter.differ.submitList(listOfPost)
+                    profileAdapter.differ.submitList(listOfPost.toMutableList())
                 }
             }
             Log.d(TAG, id)
@@ -120,22 +123,40 @@ class ProfileFragment : Fragment(), IProfileAdapter {
 
     override fun onPostLiked(post: Post,postId: String) {
 
-            val postCopy = post.copy(likedBy = post.likedBy.toMutableList() as ArrayList)
-            val newList = runBlocking {
-                listOfPost?.await()!!.toMutableList() as ArrayList
-            }
-            val likeList = postCopy.likedBy
-            if(likeList.contains(user.uid)) likeList.remove(user.uid) else likeList.add(user.uid)
+        val postCopy = post.copy(likedBy = post.likedBy.toMutableList() as ArrayList)
+        val newList = runBlocking {
+            listOfPost?.await()!!.toMutableList() as ArrayList
+        }
+        val likeList = postCopy.likedBy
+        if(likeList.contains(user.uid)) likeList.remove(user.uid) else likeList.add(user.uid)
 
-            postDao.likedPost(postCopy, postId).addOnCompleteListener{
-                if(it.isSuccessful)
-                    Log.d(TAG, "Post like updated, like: "+post.likedBy.size)
-            }
-            Log.d(TAG, "id : ${list.indexOf(postId)} , ${post.likedBy.size}, ${postCopy.likedBy.size}")
+        postDao.likedPost(postCopy, postId).addOnCompleteListener{
+            if(it.isSuccessful)
+                Log.d(TAG, "Post like updated, like: "+post.likedBy.size)
+        }
+        Log.d(TAG, "id : ${list.indexOf(postId)} , ${post.likedBy.size}, ${postCopy.likedBy.size}")
 
-            newList[list.indexOf(postId)] = postCopy
-            profileAdapter.differ.submitList(newList)
+        newList[list.indexOf(postId)] = postCopy
+        profileAdapter.differ.submitList(newList)
 
+    }
+
+    override fun onCommentButtonClicked(postId: String) {
+        val bundle = Bundle()
+        bundle.putString("postId", postId)
+        val commentsFragment = CommentsFragment()
+        commentsFragment.arguments = bundle
+
+        Helper.isOpenedFromProfile = true
+        requireFragmentManager().beginTransaction().apply {
+            Log.d(TAG, "reacheddddddddddddddd 1")
+            add(R.id.frameLayoutForFragments,commentsFragment)
+            Log.d(TAG, "reacheddddddddddddddd 2")
+            addToBackStack(null)
+            Log.d(TAG, "reacheddddddddddddddd 3")
+            commit()
+            Log.d(TAG, "reacheddddddddddddddd 4")
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -148,8 +169,14 @@ class ProfileFragment : Fragment(), IProfileAdapter {
             dialog.dismiss()
             postDao.deletePost(postId).addOnCompleteListener {
                 if (it.isSuccessful) {
-                    profileAdapter.notifyItemRemoved(position)
-                    profileAdapter.notifyItemRangeChanged(position, profileAdapter.itemCount-position)
+                    val updatedList = runBlocking {
+                        listOfPost?.await()
+                    }
+                    val delPost = updatedList?.removeAt(position)
+                    Log.d(TAG, "text:  ${delPost?.postText}, size: ${updatedList?.size} $updatedList")
+                    GlobalScope.launch(Dispatchers.Main){
+                        profileAdapter.differ.submitList(updatedList!!)
+                    }
                     binding.numberOfPost.text = "${profileAdapter.itemCount}\nPosts"
                     Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
                 }

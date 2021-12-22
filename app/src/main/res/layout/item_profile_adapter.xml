@@ -61,6 +61,8 @@
             android:padding="10dp"
             android:textColor="@color/white_1"
             android:textSize="16sp"
+            android:autoLink="web|email"
+            android:textColorLink="@color/line_color"
             tools:text="Hyy, Ramesh Gutka here, Bolo zuban kesari" />
 
         <ImageView
@@ -70,25 +72,37 @@
             android:layout_gravity="center"
             android:contentDescription="@string/post"
             android:padding="1dp"
-            tools:ignore="ImageContrastCheck"
-            android:src="@drawable/galler_image_bg_24"/>
+            android:src="@drawable/galler_image_bg_24"
+            tools:ignore="ImageContrastCheck" />
     </LinearLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="center_vertical"
             >
 
             <ToggleButton
                 android:id="@+id/likeBtn_Profile"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:background="@drawable/like_toggle_selector"
                 android:text="@string/space"
                 android:textOff=""
                 android:textOn=""
+                android:layout_marginEnd="4dp"
                 tools:ignore="TouchTargetSizeCheck" />
+
+            <ImageView
+                android:id="@+id/commentBtn_Profile"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:background="@drawable/bubble_chat"
+                android:contentDescription="@string/app_name" />
 
             <TextView
                 android:id="@+id/likeCount_Profile"

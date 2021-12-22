@@ -125,4 +125,9 @@ class PostDao {
         return postCollection.document(postId).set(post)
     }
 
+    fun deleteComment(commentId: String, postId: String): Task<Void> {
+        return postCollection.document(postId)
+            .collection("comments")
+            .document(commentId).delete()
+    }
 }

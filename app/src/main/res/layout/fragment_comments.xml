@@ -7,29 +7,105 @@
     android:background="@color/black"
     tools:context=".fragments.CommentsFragment">
 
-    <TextView
+    <RelativeLayout
         android:id="@+id/commentsTitleTV"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/matt_black"
-        android:padding="5dp"
-        android:text="@string/comments"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/progressBarComment"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="@string/comments"
+            android:textColor="@color/white_1"
+            android:textSize="18sp"
+            android:layout_marginEnd="4dp"
+            android:textStyle="bold"
+             />
+
+        <ImageView
+            android:layout_width="5dp"
+            android:layout_height="5dp"
+            android:src="@drawable/dot"
+            android:layout_gravity="center_vertical"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:id="@+id/noOfComments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:layout_gravity="bottom"
+            android:text="@string/_0"
+            android:textColor="@color/white_1"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBarComment"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="3dp"
+        android:indeterminateTint="@color/white_1"
+        android:background="@color/matt_black"
+        android:indeterminate="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        />
+
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/comment_bg"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        app:layout_constraintTop_toBottomOf="@+id/commentsTitleTV"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/commentTextET"
+        android:src="@drawable/comment_bg"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintVertical_bias="0.4"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/noComment_t"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="@string/no_comments"
         android:textColor="@color/white_1"
-        android:textSize="18sp"
+        android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/comment_bg" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewForComments"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/commentsTitleTV"
         app:layout_constraintBottom_toTopOf="@+id/commentTextET"
-        tools:listitem="@layout/comment_item_view"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/commentsTitleTV" />
 
     <EditText
         android:id="@+id/commentTextET"
@@ -48,8 +124,8 @@
         app:layout_constraintTop_toBottomOf="@+id/recyclerViewForComments"
         tools:ignore="TextContrastCheck"
         android:textColor="@color/white_1"
+        android:textCursorDrawable="@color/white"
         />
-
 
     <Button
         android:id="@+id/postComment"

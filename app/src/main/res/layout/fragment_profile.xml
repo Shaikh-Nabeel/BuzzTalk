@@ -18,7 +18,7 @@
         android:contentDescription="@string/app_name"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:src="@drawable/user_profile_default"
+        android:src="@drawable/user"
         />
 
     <TextView

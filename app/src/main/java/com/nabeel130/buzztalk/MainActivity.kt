@@ -31,7 +31,6 @@ import com.nabeel130.buzztalk.daos.PostDao
 import com.nabeel130.buzztalk.databinding.ActivityMainBinding
 import com.nabeel130.buzztalk.fragments.CommentsFragment
 import com.nabeel130.buzztalk.fragments.ProfileFragment
-import com.nabeel130.buzztalk.models.Comments
 import com.nabeel130.buzztalk.models.Post
 import com.nabeel130.buzztalk.notifications.Notifications
 import com.nabeel130.buzztalk.notifications.PushNotification
@@ -231,6 +230,7 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         commentsFragment.arguments = bundle
         binding.recyclerView.visibility = View.GONE
         binding.createPostBtn.visibility = View.GONE
+        Helper.isOpenedFromProfile = false
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.frameLayoutForFragments,commentsFragment)
             addToBackStack(null)
@@ -293,7 +293,7 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
                 binding.recyclerView.visibility = View.GONE
                 binding.createPostBtn.visibility = View.GONE
                 supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.frameLayoutForFragments,profileFragment)
+                    add(R.id.frameLayoutForFragments,profileFragment)
                     addToBackStack(null)
                     commit()
                 }

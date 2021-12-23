@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:background="@drawable/border_for_post_text"
     android:layout_margin="2dp"
-    android:orientation="vertical"
+    android:background="@drawable/border_for_post_text"
     android:backgroundTint="@color/matt_black"
-    >
+    android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:layout_marginTop="2dp">
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="5dp">
 
         <TextView
             android:id="@+id/createdAt_Profile"
@@ -21,48 +20,46 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_toStartOf="@+id/postOptionMenuFragment"
             android:layout_marginStart="5dp"
             android:layout_marginTop="5dp"
+            android:layout_toStartOf="@+id/postOptionMenuFragment"
             android:padding="2dp"
             android:paddingStart="4dp"
             android:textColor="@color/white_90"
             android:textSize="13sp"
             tools:ignore="RtlSymmetry"
-            tools:text="12/23/2001"
-            />
+            tools:text="12/23/2001" />
 
         <ImageView
             android:id="@+id/postOptionMenuFragment"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
-            android:contentDescription="@string/more_btn"
+            android:background="@drawable/ic_baseline_more_vert_24"
             android:backgroundTint="@color/white_1"
-            android:background="@drawable/ic_baseline_more_vert_24"/>
+            android:contentDescription="@string/more_btn" />
 
-        </RelativeLayout>
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:orientation="vertical"
         android:background="@drawable/post_text_background"
-        >
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/postText_Profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autoLink="web|email"
             android:padding="10dp"
             android:textColor="@color/white_1"
-            android:textSize="16sp"
-            android:autoLink="web|email"
             android:textColorLink="@color/line_color"
+            android:textSize="16sp"
             tools:text="Hyy, Ramesh Gutka here, Bolo zuban kesari" />
 
         <ImageView
@@ -76,45 +73,44 @@
             tools:ignore="ImageContrastCheck" />
     </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:gravity="center_vertical">
+
+        <ToggleButton
+            android:id="@+id/likeBtn_Profile"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/like_toggle_selector"
+            android:text="@string/space"
+            android:textOff=""
+            android:textOn=""
+            tools:ignore="TouchTargetSizeCheck" />
+
+        <ImageView
+            android:id="@+id/commentBtn_Profile"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:background="@drawable/bubble_chat"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:id="@+id/likeCount_Profile"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:gravity="center_vertical"
-            >
+            android:layout_marginStart="5dp"
+            android:padding="3dp"
+            android:textColor="@color/white_1"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            tools:text="24 likes" />
 
-            <ToggleButton
-                android:id="@+id/likeBtn_Profile"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:background="@drawable/like_toggle_selector"
-                android:text="@string/space"
-                android:textOff=""
-                android:textOn=""
-                android:layout_marginEnd="4dp"
-                tools:ignore="TouchTargetSizeCheck" />
-
-            <ImageView
-                android:id="@+id/commentBtn_Profile"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:background="@drawable/bubble_chat"
-                android:contentDescription="@string/app_name" />
-
-            <TextView
-                android:id="@+id/likeCount_Profile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:padding="3dp"
-                android:textColor="@color/white_1"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                tools:text="24 likes" />
-
-        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>

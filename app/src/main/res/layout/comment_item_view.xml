@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_margin="1dp"
     android:background="@drawable/border_for_post_text"
     android:backgroundTint="@color/matt_black"
-    android:layout_margin="1dp"
     android:padding="10dp">
 
     <ImageView
@@ -31,9 +31,9 @@
         android:layout_toEndOf="@+id/profilePicForComment"
         android:paddingStart="5dp"
         android:textColor="@color/white_1"
-        tools:ignore="RtlSymmetry"
-        tools:text="ramesh gutka"
         android:textSize="14sp"
+        tools:ignore="RtlSymmetry"
+        tools:text="Shaikh Nabs"
         tools:textColor="@color/white_1" />
 
     <TextView
@@ -46,9 +46,9 @@
         android:layout_toEndOf="@+id/profilePicForComment"
         android:paddingStart="5dp"
         android:textColor="@color/white_3"
+        android:textSize="11sp"
         tools:ignore="RtlSymmetry"
         tools:text="Nov 3 2021 4:30 am"
-        android:textSize="11sp"
         tools:textColor="@color/white_1" />
 
     <TextView
@@ -67,6 +67,6 @@
         android:textColor="@color/white_1"
         android:textColorLink="@color/line_color"
         tools:ignore="RtlSymmetry,TouchTargetSizeCheck"
-        tools:text="sleeban@gm.com ..hgjkh hfwwakuku fa hfa ahfhf k fkfja j afjf" />
+        tools:text="Hey that's nice post" />
 
 </RelativeLayout>

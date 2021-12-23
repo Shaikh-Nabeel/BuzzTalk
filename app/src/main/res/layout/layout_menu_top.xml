@@ -1,32 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="180dp"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:background="@drawable/navigation_header_bg"
+    android:orientation="vertical"
     android:paddingTop="80dp">
+
     <ImageView
+        android:id="@+id/profilePicForMenuBar"
         android:layout_width="46dp"
         android:layout_height="46dp"
-        tools:background="@color/white"
-        android:id="@+id/profilePicForMenuBar"
+        android:layout_marginStart="30dp"
         android:contentDescription="@string/app_name"
         android:scaleType="centerCrop"
-        android:layout_marginStart="30dp"
-        />
+        tools:background="@color/white" />
 
     <TextView
         android:id="@+id/userNameForMenuBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="Ramesh Gutka"
+        android:layout_marginStart="10dp"
+        android:layout_marginBottom="5dp"
+        android:fontFamily="sans-serif-black"
+        android:padding="10dp"
         android:textColor="@color/white_1"
         android:textSize="18sp"
-        android:padding="10dp"
-        android:layout_marginStart="10dp"
-        android:fontFamily="sans-serif-black"
-        android:layout_marginBottom="5dp"
-        />
+        tools:text="Shaikh Nabs" />
 
 </LinearLayout>

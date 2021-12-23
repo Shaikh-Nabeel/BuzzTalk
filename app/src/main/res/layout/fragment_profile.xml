@@ -6,8 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/black"
     app:layoutDescription="@xml/fragment_profile_scene"
-    tools:context=".fragments.ProfileFragment"
-    >
+    tools:context=".fragments.ProfileFragment">
 
     <ImageView
         android:id="@+id/profilePicForFragments"
@@ -16,10 +15,9 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:contentDescription="@string/app_name"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         android:src="@drawable/user"
-        />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/numberOfPost"
@@ -28,19 +26,19 @@
         android:layout_marginTop="15dp"
         android:layout_marginEnd="20dp"
         android:gravity="center"
+        android:text="@string/_0_post"
         android:textColor="@color/white_1"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:text="@string/_0_post" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
         android:id="@+id/progressBarForProfile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:indeterminate="true"
         android:elevation="10dp"
+        android:indeterminate="true"
         android:indeterminateTint="@color/white"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -55,35 +53,34 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="5dp"
+        android:text="@string/username"
         android:textColor="@color/white_1"
         android:textSize="22sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/viewDividerForProfile"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profilePicForFragments"
-        android:text="@string/username" />
+        app:layout_constraintTop_toBottomOf="@+id/profilePicForFragments" />
 
     <View
         android:id="@+id/viewDividerForProfile"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/white_1"
-        app:layout_constraintTop_toBottomOf="@id/userNameForFragments"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/recyclerViewForProfile"
         android:layout_margin="5dp"
-        />
+        android:background="@color/white_1"
+        app:layout_constraintBottom_toTopOf="@+id/recyclerViewForProfile"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/userNameForFragments" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewForProfile"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:descendantFocusability="blocksDescendants"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/viewDividerForProfile"
-        tools:listitem="@layout/item_profile_adapter"
-        android:descendantFocusability="blocksDescendants"/>
+        tools:listitem="@layout/item_profile_adapter" />
 
 </androidx.constraintlayout.motion.widget.MotionLayout>

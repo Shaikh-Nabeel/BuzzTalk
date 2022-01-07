@@ -5,59 +5,63 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/matt_black"
-    tools:context=".CreatePostActivity">
+    tools:context=".activity.CreatePostActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/customToolB2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/matt_black"
+        android:elevation="20dp"
         android:maxHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="POST"
+        app:titleTextColor="@color/white" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/customToolB2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        >
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/customToolB2">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:padding="10dp"
-            >
+            android:padding="10dp">
 
             <LinearLayout
+                android:id="@+id/linLayoutTextPost"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
                 app:layout_constraintBottom_toTopOf="@+id/relativeLayoutImg"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:orientation="vertical"
-                android:id="@+id/linLayoutTextPost"
-                >
+                app:layout_constraintTop_toTopOf="parent">
 
                 <EditText
                     android:id="@+id/postText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@color/matt_black"
                     android:gravity="top"
                     android:hint="@string/post_hint"
                     android:importantForAutofill="no"
                     android:inputType="textMultiLine"
                     android:minLines="3"
                     android:padding="10dp"
-                    android:background="@color/matt_black"
+                    android:textSize="16sp"
+                    android:letterSpacing="-0.01"
                     android:textColor="@color/white"
-                    android:textColorHint="@color/white" />
+                    android:textColorHint="@color/white"
+                    android:textCursorDrawable="@color/white"
+                    tools:text="Hello, this is my first post..." />
 
                 <ImageView
                     android:id="@+id/imageViewPost"
@@ -65,9 +69,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="10dp"
+                    android:contentDescription="@string/space"
                     android:padding="5dp"
                     android:scaleType="fitXY"
-                    android:contentDescription="@string/space"
                     android:visibility="gone" />
             </LinearLayout>
 
@@ -89,7 +93,7 @@
                     android:layout_height="45dp"
                     android:layout_weight="1"
                     android:contentDescription="@string/app_name"
-                    android:src="@drawable/camera_24"
+                    android:src="@drawable/photo_camera"
                     tools:ignore="DuplicateSpeakableTextCheck,TouchTargetSizeCheck" />
 
                 <ImageView
@@ -99,7 +103,7 @@
                     android:layout_height="45dp"
                     android:layout_weight="1"
                     android:contentDescription="@string/app_name"
-                    android:src="@drawable/gallery_24"
+                    android:src="@drawable/photo_gallery"
                     tools:ignore="TouchTargetSizeCheck" />
 
             </LinearLayout>
@@ -109,11 +113,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
                 android:layout_marginTop="12dp"
-                android:text="@string/post"
-                android:textSize="16sp"
-                android:textColor="@color/white_1"
-                android:textStyle="bold"
                 android:background="@drawable/border_for_post_text"
+                android:elevation="25dp"
+                android:text="@string/post"
+                android:textColor="@color/white_1"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/relativeLayoutImg" />

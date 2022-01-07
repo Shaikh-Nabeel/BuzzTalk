@@ -11,4 +11,10 @@
         android:title="@string/share"
         app:showAsAction="ifRoom"
         />
+
+    <item
+        android:id="@+id/reportPost"
+        android:title="@string/report"
+        app:showAsAction="ifRoom"
+        />
 </menu>

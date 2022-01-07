@@ -5,8 +5,10 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.ktx.Firebase
+import com.nabeel130.buzztalk.models.Comments
 import com.nabeel130.buzztalk.models.Post
 import com.nabeel130.buzztalk.models.User
 import com.nabeel130.buzztalk.models.UserPost
@@ -26,7 +28,6 @@ class PostDao {
     companion object {
         lateinit var lastPost: Post
     }
-
 
     fun addPost(text: String, uuid: String?){
         GlobalScope.launch(Dispatchers.IO) {
@@ -104,5 +105,29 @@ class PostDao {
         }.addOnFailureListener {
             it.printStackTrace()
         }
+    }
+
+    fun loadComments(postId: String): Task<QuerySnapshot> {
+        return postCollection.document(postId)
+            .collection("comments")
+            .orderBy("date", Query.Direction.DESCENDING)
+            .get()
+    }
+
+    fun postComment(postId: String, comment: Comments): Task<Void> {
+        return postCollection.document(postId)
+            .collection("comments")
+            .document()
+            .set(comment)
+    }
+
+    fun likedPost(post: Post, postId: String): Task<Void>{
+        return postCollection.document(postId).set(post)
+    }
+
+    fun deleteComment(commentId: String, postId: String): Task<Void> {
+        return postCollection.document(postId)
+            .collection("comments")
+            .document(commentId).delete()
     }
 }

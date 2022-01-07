@@ -44,6 +44,7 @@
     <color name="inactive_btn_not_filled_font_color">#686A6B</color>
     <color name="line_color">#6E71AB</color>
     <color name="red">#EB5757</color>
+    <color name="yellow">#DFC415</color>
     <color name="green">#27AE60</color>
     <color name="white_smoke">#F8F6F6</color>
     <color name="white_90">#90FFFFFF</color>

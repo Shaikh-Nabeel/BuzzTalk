@@ -16,31 +16,33 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.nabeel130.buzztalk.MainActivity
+import com.nabeel130.buzztalk.activity.MainActivity
 import com.nabeel130.buzztalk.R
 import kotlin.random.Random
 
 private const val CHANNEL_ID = "buzztalk_channel"
-class FirebaseService: FirebaseMessagingService() {
+
+class FirebaseService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
-        if(message.data["userUid"] == Firebase.auth.currentUser?.uid!!) {
+        if (message.data["userUid"] == Firebase.auth.currentUser?.uid!!) {
             return
         }
 
         val intent = Intent(this, MainActivity::class.java)
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notificationID = Random.nextInt()
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel(notificationManager)
         }
 
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
 
-        val pendingIntent = PendingIntent.getActivity(this,0,intent, FLAG_ONE_SHOT)
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent, FLAG_ONE_SHOT)
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(message.data["title"])
             .setContentText(message.data["message"])
@@ -53,13 +55,13 @@ class FirebaseService: FirebaseMessagingService() {
             .setContentIntent(pendingIntent)
             .build()
 
-        notificationManager.notify(notificationID,notification)
+        notificationManager.notify(notificationID, notification)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createNotificationChannel(notificationManager: NotificationManager){
+    private fun createNotificationChannel(notificationManager: NotificationManager) {
         val channelName = "Post Notification"
-        val channel = NotificationChannel(CHANNEL_ID, channelName,IMPORTANCE_DEFAULT).apply {
+        val channel = NotificationChannel(CHANNEL_ID, channelName, IMPORTANCE_DEFAULT).apply {
             description = "Custom notifications"
             enableLights(true)
             enableVibration(true)

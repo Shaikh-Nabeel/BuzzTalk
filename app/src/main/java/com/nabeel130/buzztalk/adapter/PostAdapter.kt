@@ -1,7 +1,10 @@
-package com.nabeel130.buzztalk
+package com.nabeel130.buzztalk.adapter
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -18,8 +21,10 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.nabeel130.buzztalk.R
 import com.nabeel130.buzztalk.models.Post
 import com.nabeel130.buzztalk.utility.GlideApp
+import com.nabeel130.buzztalk.utility.Helper
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -27,10 +32,10 @@ import java.util.*
 val user = Firebase.auth.currentUser!!.uid
 val storageRef = FirebaseStorage.getInstance().reference
 
-class PostAdapter(options: FirestoreRecyclerOptions<Post>, private val listener: IPostAdapter):
+class PostAdapter(options: FirestoreRecyclerOptions<Post>, private val listener: IPostAdapter) :
     FirestoreRecyclerAdapter<Post, PostAdapter.PostViewHolder>(options) {
 
-    class PostViewHolder(view: View): RecyclerView.ViewHolder(view) {
+    class PostViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val postText: TextView = view.findViewById(R.id.postContent)
         val userName: TextView = view.findViewById(R.id.userName)
         val createdAt: TextView = view.findViewById(R.id.createdAt)
@@ -44,7 +49,7 @@ class PostAdapter(options: FirestoreRecyclerOptions<Post>, private val listener:
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
-        val viewHolder =  PostViewHolder(
+        val viewHolder = PostViewHolder(
             LayoutInflater.from(parent.context)
                 .inflate(
                     R.layout.recycler_view_item,
@@ -55,6 +60,7 @@ class PostAdapter(options: FirestoreRecyclerOptions<Post>, private val listener:
 
         viewHolder.likeBtn.setOnClickListener {
             listener.onPostLiked(snapshots.getSnapshot(viewHolder.adapterPosition).id)
+            startApplianceAnim(viewHolder.likeBtn)
         }
 
         viewHolder.likeCount.setOnClickListener {
@@ -62,15 +68,39 @@ class PostAdapter(options: FirestoreRecyclerOptions<Post>, private val listener:
         }
 
         viewHolder.commentBtn.setOnClickListener {
-            listener.onPostCommentPressed(snapshots.getSnapshot(viewHolder.adapterPosition).id)
+            listener.onPostCommentPressed(
+                snapshots.getSnapshot(viewHolder.adapterPosition).id,
+                snapshots.getSnapshot(viewHolder.adapterPosition)
+                    .toObject(Post::class.java)!!
+                    .createdBy.uid
+            )
         }
 
         return viewHolder
     }
 
+    private fun startApplianceAnim(toggleButton: ToggleButton) {
+
+        val animationSet = AnimatorSet()
+        val scaleY = ObjectAnimator.ofFloat(toggleButton, "scaleY", 0.6f, 1f)
+        val scaleX = ObjectAnimator.ofFloat(toggleButton, "scaleX", 0.6f, 1f)
+        animationSet.playTogether(scaleX, scaleY)
+        animationSet.duration = 200
+        animationSet.start()
+
+//        val animationSet2 = AnimatorSet()
+//        val scaleY2 = ObjectAnimator.ofFloat(toggleButton, "scaleY", 1.2f, 1f)
+//        val scaleX2 = ObjectAnimator.ofFloat(toggleButton, "scaleX", 1.2f, 1f)
+//        animationSet2.playTogether(scaleX2, scaleY2)
+//        animationSet2.duration = 150
+//        animationSet2.start()
+//        Log.d(Helper.TAG, "first animation")
+    }
+
     @SuppressLint("SimpleDateFormat")
     override fun onBindViewHolder(holder: PostViewHolder, position: Int, model: Post) {
         if (!model.postText.contentEquals("")) {
+            holder.postText.visibility = View.VISIBLE
             holder.postText.text = model.postText
         } else {
             holder.postText.visibility = View.GONE
@@ -101,11 +131,12 @@ class PostAdapter(options: FirestoreRecyclerOptions<Post>, private val listener:
             holder.postImage.visibility = View.VISIBLE
             val ref = storageRef.child("images/${model.imageUuid}")
             GlideApp.with(holder.postImage.context)
-                .load(ref)
-                .listener(object: RequestListener<Drawable> {
+                .load(ref).override(Target.SIZE_ORIGINAL)
+                .listener(object : RequestListener<Drawable> {
                     override fun onLoadFailed(
                         e: GlideException?, model: Any?, target: Target<Drawable>?,
-                        isFirstResource: Boolean): Boolean {
+                        isFirstResource: Boolean
+                    ): Boolean {
                         holder.progress.visibility = View.GONE
                         return false
                     }
@@ -122,6 +153,7 @@ class PostAdapter(options: FirestoreRecyclerOptions<Post>, private val listener:
                 .into(holder.postImage)
         } else {
             holder.postImage.visibility = View.GONE
+            holder.progress.visibility = View.GONE
         }
 
         val isLiked = model.likedBy.contains(user)
@@ -132,9 +164,13 @@ class PostAdapter(options: FirestoreRecyclerOptions<Post>, private val listener:
             menu.setOnMenuItemClickListener {
                 val id = it.itemId
                 if (id == R.id.deletePost) {
-                    listener.onDeletePostClicked(snapshots.getSnapshot(holder.adapterPosition).id,model.imageUuid)
+                    listener.onDeletePostClicked(
+                        snapshots.getSnapshot(holder.adapterPosition).id,
+                        model.imageUuid
+                    )
                 } else if (id == R.id.sharePost) {
-                    val textToSend = "[App: BuzzTalk]\nPost{ ${model.createdBy.userName} : '${model.postText}' }"
+                    val textToSend =
+                        "[App: BuzzTalk]\nPost{ ${model.createdBy.userName} : '${model.postText}' }"
                     listener.onShareClicked(textToSend, model.createdBy.userName!!)
                 }
                 false
@@ -142,15 +178,17 @@ class PostAdapter(options: FirestoreRecyclerOptions<Post>, private val listener:
             if (user != model.createdBy.uid) {
                 menu.menu.removeItem(R.id.deletePost)
             }
+            if (user == model.createdBy.uid)
+                menu.menu.removeItem(R.id.reportPost)
             menu.show()
         }
     }
 }
 
-interface IPostAdapter{
+interface IPostAdapter {
     fun onPostLiked(postId: String)
     fun onLikeCountClicked(postId: String)
     fun onDeletePostClicked(postId: String, uuid: String?)
     fun onShareClicked(text: String, userName: String)
-    fun onPostCommentPressed(postId: String)
+    fun onPostCommentPressed(postId: String, createdBy: String)
 }

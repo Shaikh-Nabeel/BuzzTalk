@@ -29,10 +29,10 @@
             android:resource="@drawable/icons8_b_100" />
 
         <activity
-            android:name=".CreatePostActivity"
+            android:name=".activity.CreatePostActivity"
             android:exported="false" />
         <activity
-            android:name=".SignInActivity"
+            android:name=".activity.SignInActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,7 +41,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:exported="true"/>
 
         <provider

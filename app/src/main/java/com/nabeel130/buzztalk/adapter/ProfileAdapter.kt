@@ -1,4 +1,4 @@
-package com.nabeel130.buzztalk.fragments
+package com.nabeel130.buzztalk.adapter
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -17,7 +17,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.nabeel130.buzztalk.R
 import com.nabeel130.buzztalk.models.Post
-import com.nabeel130.buzztalk.storageRef
 import com.nabeel130.buzztalk.utility.GlideApp
 import com.nabeel130.buzztalk.utility.Helper.Companion.TAG
 import java.text.DateFormat
@@ -30,8 +29,7 @@ val uid = auth.currentUser!!.uid
 class ProfileAdapter(
     private val listOfId: ArrayList<String>,
     private val listener: IProfileAdapter
-) :
-    RecyclerView.Adapter<ProfileAdapter.ProfileViewHolder>() {
+) : RecyclerView.Adapter<ProfileAdapter.ProfileViewHolder>() {
 
     class ProfileViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val createdAt: TextView = view.findViewById(R.id.createdAt_Profile)
@@ -56,10 +54,12 @@ class ProfileAdapter(
     val differ = AsyncListDiffer(this, differCallback)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProfileViewHolder {
+
         val viewHolder = ProfileViewHolder(
             LayoutInflater.from(parent.context)
                 .inflate(R.layout.item_profile_adapter, parent, false)
         )
+
         viewHolder.likeBtn.setOnClickListener {
             listener.onPostLiked(
                 differ.currentList[viewHolder.adapterPosition],
@@ -69,7 +69,10 @@ class ProfileAdapter(
         }
 
         viewHolder.commentBtn.setOnClickListener {
-            listener.onCommentButtonClicked(listOfId[viewHolder.adapterPosition])
+            listener.onCommentButtonClicked(
+                listOfId[viewHolder.adapterPosition],
+                differ.currentList[viewHolder.adapterPosition].createdBy.uid
+            )
         }
 
         return viewHolder
@@ -86,6 +89,7 @@ class ProfileAdapter(
         holder.createdAt.text = dateFormat.format(calendar.time)
 
         if (!model.postText.contentEquals("")) {
+            holder.postText.visibility = View.VISIBLE
             holder.postText.text = model.postText
         } else {
             holder.postText.visibility = View.GONE
@@ -118,7 +122,7 @@ class ProfileAdapter(
                         listener.onDeletePostClicked(listOfId[position], holder.adapterPosition)
                         Log.d(
                             TAG,
-                            "adapaterposition: ${holder.adapterPosition}, position: $position, ${listOfId[position]}"
+                            "adapater position: ${holder.adapterPosition}, position: $position, ${listOfId[position]}"
                         )
                         listOfId.removeAt(position)
                         true
@@ -133,6 +137,7 @@ class ProfileAdapter(
                 }
             }
             menu.show()
+            menu.menu.removeItem(R.id.reportPost)
         }
     }
 
@@ -145,5 +150,5 @@ interface IProfileAdapter {
     fun onPostLiked(post: Post, postId: String)
     fun onDeletePostClicked(postId: String, position: Int)
     fun onShareClicked(text: String, userName: String)
-    fun onCommentButtonClicked(postId: String)
+    fun onCommentButtonClicked(postId: String, createdBy: String)
 }

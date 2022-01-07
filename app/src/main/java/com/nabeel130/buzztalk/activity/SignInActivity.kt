@@ -1,11 +1,15 @@
-package com.nabeel130.buzztalk
+package com.nabeel130.buzztalk.activity
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.browser.customtabs.CustomTabsIntent
@@ -18,9 +22,12 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.nabeel130.buzztalk.R
 import com.nabeel130.buzztalk.daos.UserDao
 import com.nabeel130.buzztalk.databinding.ActivitySignInBinding
 import com.nabeel130.buzztalk.models.User
+import androidx.core.content.ContextCompat
+
 
 class SignInActivity : AppCompatActivity() {
 
@@ -32,6 +39,7 @@ class SignInActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySignInBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setStatusBarGradiant(this)
 
         auth = Firebase.auth
 
@@ -40,12 +48,12 @@ class SignInActivity : AppCompatActivity() {
             .requestEmail()
             .build()
 
-        googleSignInClient = GoogleSignIn.getClient(this,gso)
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
         updateUI(auth.currentUser)
         binding.googleSignInBtn.setOnClickListener {
-            if(binding.checkBoxforPrivacy.isChecked) {
+            if (binding.checkBoxforPrivacy.isChecked) {
                 signIn()
-            }else{
+            } else {
                 Toast.makeText(
                     applicationContext,
                     "Accept Terms and Conditions",
@@ -58,22 +66,33 @@ class SignInActivity : AppCompatActivity() {
             val builder = CustomTabsIntent.Builder().build()
             builder.launchUrl(this, Uri.parse(getString(R.string.privacy_policy_link)))
         }
-        
+
     }
 
+    fun setStatusBarGradiant(activity: Activity) {
+        val window = activity.window
+        val background =
+            ContextCompat.getDrawable(applicationContext, R.drawable.sign_in_background)
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor =
+            ContextCompat.getColor(applicationContext, android.R.color.transparent)
+        window.navigationBarColor =
+            ContextCompat.getColor(applicationContext, android.R.color.transparent)
+        window.setBackgroundDrawable(background)
+    }
 
     private val launcher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
-        if(it.resultCode == Activity.RESULT_OK){
+        if (it.resultCode == Activity.RESULT_OK) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(it.data)
             binding.googleSignInBtn.visibility = View.GONE
             binding.progressBarLogin.visibility = View.VISIBLE
-            try{
+            try {
                 val account = task.getResult(ApiException::class.java)
                 firebaseAuthWithGoogle(account.idToken)
-            }catch(e: Exception){
-                Toast.makeText(applicationContext,"Couldn't sign in!",Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(applicationContext, "Couldn't sign in!", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -92,13 +111,13 @@ class SignInActivity : AppCompatActivity() {
     }
 
     private fun updateUI(user: FirebaseUser?) {
-        if(user != null){
-            val userObj = User(user.uid,user.email,user.displayName,user.photoUrl.toString())
+        if (user != null) {
+            val userObj = User(user.uid, user.email, user.displayName, user.photoUrl.toString())
             val userDao = UserDao()
             userDao.addUser(userObj)
-            startActivity(Intent(this,MainActivity::class.java))
+            startActivity(Intent(this, MainActivity::class.java))
             finish()
-        }else{
+        } else {
             googleSignInClient.signOut()
             binding.googleSignInBtn.visibility = View.VISIBLE
             binding.progressBarLogin.visibility = View.GONE

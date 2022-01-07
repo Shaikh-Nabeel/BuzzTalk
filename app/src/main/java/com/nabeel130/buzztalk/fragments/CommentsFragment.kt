@@ -11,8 +11,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.ktx.Firebase
-import com.nabeel130.buzztalk.MainActivity
+import com.nabeel130.buzztalk.activity.MainActivity
 import com.nabeel130.buzztalk.R
+import com.nabeel130.buzztalk.adapter.CommentsAdapter
+import com.nabeel130.buzztalk.adapter.ICommentAdapter
 import com.nabeel130.buzztalk.daos.PostDao
 import com.nabeel130.buzztalk.databinding.FragmentCommentsBinding
 import com.nabeel130.buzztalk.models.Comments
@@ -30,13 +32,19 @@ class CommentsFragment : Fragment(), ICommentAdapter {
     private var user = Firebase.auth.currentUser!!
     private lateinit var listOfComment: Deferred<MutableList<DocumentSnapshot>>
     private lateinit var postId: String
+    private lateinit var createdBy: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        postId = arguments?.getString("postId")!!
-        _binding = FragmentCommentsBinding.inflate(inflater,container,false)
+        try {
+            postId = arguments?.getString("postId")!!
+            createdBy = arguments?.getString("createdBy")!!
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        _binding = FragmentCommentsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -60,11 +68,11 @@ class CommentsFragment : Fragment(), ICommentAdapter {
     private fun postComment() {
         val comment = binding.commentTextET.text.toString()
         binding.commentTextET.setText("")
-        if(comment.isNotEmpty() && comment.isNotBlank()){
-            val comments = Comments(user.uid,comment.trim(),System.currentTimeMillis())
+        if (comment.isNotEmpty() && comment.isNotBlank()) {
+            val comments = Comments(user.uid, comment.trim(), System.currentTimeMillis())
             postDao.postComment(postId, comments)
                 .addOnCompleteListener {
-                    if(it.isSuccessful) Log.d(TAG, "Comment posted")
+                    if (it.isSuccessful) Log.d(TAG, "Comment posted")
                     listOfComment = GlobalScope.async(Dispatchers.IO) {
                         loadComments()
                     }
@@ -77,13 +85,13 @@ class CommentsFragment : Fragment(), ICommentAdapter {
         return postDao.loadComments(postId).await().documents
     }
 
-    private fun submitList(){
+    private fun submitList() {
 
         GlobalScope.launch(Dispatchers.Main) {
             if (listOfComment.await().size > 0 && _binding != null) {
                 binding.commentBg.visibility = View.GONE
                 binding.noCommentT.visibility = View.GONE
-            }else {
+            } else {
                 binding.progressBarComment.visibility = View.INVISIBLE
                 return@launch
             }
@@ -97,13 +105,26 @@ class CommentsFragment : Fragment(), ICommentAdapter {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        if(Helper.isOpenedFromProfile) return
+        if (Helper.isOpenedFromProfile) return
         MainActivity.getInstance().visibleComponentOfMainActivity()
     }
 
-    override fun onLongClick(commentId: String, position: Int) {
-        Log.d(TAG, "position: $position, id: $commentId")
-        val dialog = Helper.buildDialogBox(requireContext(),"Are you sure?","Do you want to delete this comment?")
+    override fun onLongClick(commentSnapId: String, commentId: String, position: Int) {
+
+        if (commentId != Firebase.auth.currentUser?.uid) {
+            Log.d(TAG, "Comment is not created by user")
+            if (createdBy != Firebase.auth.currentUser?.uid) {
+                Log.d(TAG, "Post is created by the user")
+                return
+            }
+        }
+
+        Log.d(TAG, "position: $position, id: $commentSnapId")
+        val dialog = Helper.buildDialogBox(
+            requireContext(),
+            "Are you sure?",
+            "Do you want to delete this comment?"
+        )
 
         val confirmBtn: Button = dialog.findViewById(R.id.confirm_button)
         val denyBtn: Button = dialog.findViewById(R.id.deny_button)
@@ -112,16 +133,16 @@ class CommentsFragment : Fragment(), ICommentAdapter {
 
         confirmBtn.setOnClickListener {
             dialog.dismiss()
-            postDao.deleteComment(commentId, postId).addOnCompleteListener {
-                if(!it.isSuccessful) return@addOnCompleteListener
+            postDao.deleteComment(commentSnapId, postId).addOnCompleteListener {
+                if (!it.isSuccessful) return@addOnCompleteListener
                 val copyOfComment = runBlocking {
                     listOfComment.await().toMutableList()
                 }
-                GlobalScope.launch(Dispatchers.Main){
+                GlobalScope.launch(Dispatchers.Main) {
                     listOfComment.await().removeAt(position)
                 }
                 copyOfComment.removeAt(position)
-                if(copyOfComment.size < 1){
+                if (copyOfComment.size < 1) {
                     binding.commentBg.visibility = View.VISIBLE
                     binding.noCommentT.visibility = View.VISIBLE
                 }

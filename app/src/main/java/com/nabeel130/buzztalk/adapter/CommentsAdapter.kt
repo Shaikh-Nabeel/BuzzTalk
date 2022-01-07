@@ -1,4 +1,4 @@
-package com.nabeel130.buzztalk.fragments
+package com.nabeel130.buzztalk.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -10,7 +10,10 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.ktx.Firebase
 import com.nabeel130.buzztalk.R
 import com.nabeel130.buzztalk.daos.UserDao
 import com.nabeel130.buzztalk.models.Comments
@@ -23,17 +26,18 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 private val userDao = UserDao()
-class CommentsAdapter(private val listener: ICommentAdapter)
-    : RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>() {
 
-    class CommentViewHolder(item: View):RecyclerView.ViewHolder(item){
+class CommentsAdapter(private val listener: ICommentAdapter) :
+    RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>() {
+
+    class CommentViewHolder(item: View) : RecyclerView.ViewHolder(item) {
         val userImage: ImageView = item.findViewById(R.id.profilePicForComment)
         val userName: TextView = item.findViewById(R.id.userNameForComment)
         val dateOfComment: TextView = item.findViewById(R.id.dateOfComment)
         val comment: TextView = item.findViewById(R.id.comment)
     }
 
-    private val differCallback = object : DiffUtil.ItemCallback<DocumentSnapshot>(){
+    private val differCallback = object : DiffUtil.ItemCallback<DocumentSnapshot>() {
         override fun areItemsTheSame(
             oldItem: DocumentSnapshot,
             newItem: DocumentSnapshot
@@ -50,7 +54,7 @@ class CommentsAdapter(private val listener: ICommentAdapter)
 
     }
 
-    val differ = AsyncListDiffer(this,differCallback)
+    val differ = AsyncListDiffer(this, differCallback)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommentViewHolder {
         val commentHolder = CommentViewHolder(
@@ -63,7 +67,13 @@ class CommentsAdapter(private val listener: ICommentAdapter)
         )
 
         commentHolder.itemView.setOnLongClickListener {
-            listener.onLongClick(differ.currentList[commentHolder.adapterPosition].id, commentHolder.adapterPosition)
+            val commentSnap = differ.currentList[commentHolder.adapterPosition]
+            val comment = commentSnap.toObject(Comments::class.java)!!
+            listener.onLongClick(
+                commentSnap.id,
+                comment.uid,
+                commentHolder.adapterPosition
+            )
             return@setOnLongClickListener true
         }
 
@@ -81,9 +91,9 @@ class CommentsAdapter(private val listener: ICommentAdapter)
         calendar.timeInMillis = comments.date!!
         holder.dateOfComment.text = dateFormat.format(calendar.time)
 
-        GlobalScope.launch(Dispatchers.IO){
-            userDao.getUserById(comments.uid).addOnCompleteListener{
-                if(!it.isSuccessful)return@addOnCompleteListener
+        GlobalScope.launch(Dispatchers.IO) {
+            userDao.getUserById(comments.uid).addOnCompleteListener {
+                if (!it.isSuccessful) return@addOnCompleteListener
                 val currentUser = it.result.toObject(User::class.java)!!
                 holder.userName.text = currentUser.userName
                 Glide.with(holder.userImage.context).load(currentUser.imageUrl)
@@ -97,6 +107,6 @@ class CommentsAdapter(private val listener: ICommentAdapter)
     }
 }
 
-interface ICommentAdapter{
-    fun onLongClick(commentId: String, position: Int)
+interface ICommentAdapter {
+    fun onLongClick(commentSnapId: String, commentId: String, position: Int)
 }

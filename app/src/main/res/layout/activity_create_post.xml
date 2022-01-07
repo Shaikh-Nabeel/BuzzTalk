@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/matt_black"
-    tools:context=".CreatePostActivity">
+    tools:context=".activity.CreatePostActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/customToolB2"
@@ -56,6 +56,8 @@
                     android:inputType="textMultiLine"
                     android:minLines="3"
                     android:padding="10dp"
+                    android:textSize="16sp"
+                    android:letterSpacing="-0.01"
                     android:textColor="@color/white"
                     android:textColorHint="@color/white"
                     android:textCursorDrawable="@color/white"
@@ -70,8 +72,7 @@
                     android:contentDescription="@string/space"
                     android:padding="5dp"
                     android:scaleType="fitXY"
-                    android:src="@drawable/app_icon"
-                    android:visibility="visible" />
+                    android:visibility="gone" />
             </LinearLayout>
 
             <LinearLayout
@@ -113,7 +114,7 @@
                 android:layout_height="55dp"
                 android:layout_marginTop="12dp"
                 android:background="@drawable/border_for_post_text"
-                android:elevation="5dp"
+                android:elevation="25dp"
                 android:text="@string/post"
                 android:textColor="@color/white_1"
                 android:textSize="16sp"

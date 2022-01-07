@@ -36,7 +36,7 @@
         <entry key="..\:/Users/ShaikhNabs/AndroidStudioProjects/BuzzTalk/app/src/main/res/drawable/progress_bar_rotator.xml" value="0.2125" />
         <entry key="..\:/Users/ShaikhNabs/AndroidStudioProjects/BuzzTalk/app/src/main/res/drawable/right_corner.xml" value="0.2125" />
         <entry key="..\:/Users/ShaikhNabs/AndroidStudioProjects/BuzzTalk/app/src/main/res/drawable/sign_in_background.xml" value="0.2125" />
-        <entry key="..\:/Users/ShaikhNabs/AndroidStudioProjects/BuzzTalk/app/src/main/res/layout/activity_create_post.xml" value="0.22" />
+        <entry key="..\:/Users/ShaikhNabs/AndroidStudioProjects/BuzzTalk/app/src/main/res/layout/activity_create_post.xml" value="0.25" />
         <entry key="..\:/Users/ShaikhNabs/AndroidStudioProjects/BuzzTalk/app/src/main/res/layout/activity_main.xml" value="0.22" />
         <entry key="..\:/Users/ShaikhNabs/AndroidStudioProjects/BuzzTalk/app/src/main/res/layout/activity_sign_in.xml" value="0.22" />
         <entry key="..\:/Users/ShaikhNabs/AndroidStudioProjects/BuzzTalk/app/src/main/res/layout/comment_item_view.xml" value="0.25" />
@@ -46,7 +46,7 @@
         <entry key="..\:/Users/ShaikhNabs/AndroidStudioProjects/BuzzTalk/app/src/main/res/layout/fragment_comments.xml" value="0.25" />
         <entry key="..\:/Users/ShaikhNabs/AndroidStudioProjects/BuzzTalk/app/src/main/res/layout/fragment_profile.xml" value="0.22" />
         <entry key="..\:/Users/ShaikhNabs/AndroidStudioProjects/BuzzTalk/app/src/main/res/layout/item_profile_adapter.xml" value="0.22" />
-        <entry key="..\:/Users/ShaikhNabs/AndroidStudioProjects/BuzzTalk/app/src/main/res/layout/layout_menu_top.xml" value="0.22" />
+        <entry key="..\:/Users/ShaikhNabs/AndroidStudioProjects/BuzzTalk/app/src/main/res/layout/layout_menu_top.xml" value="0.18" />
         <entry key="..\:/Users/ShaikhNabs/AndroidStudioProjects/BuzzTalk/app/src/main/res/layout/likes_view_item.xml" value="0.25" />
         <entry key="..\:/Users/ShaikhNabs/AndroidStudioProjects/BuzzTalk/app/src/main/res/layout/recycler_view_item.xml" value="0.25" />
         <entry key="..\:/Users/ShaikhNabs/AndroidStudioProjects/BuzzTalk/app/src/main/res/menu/menu_main_activity.xml" value="0.25" />

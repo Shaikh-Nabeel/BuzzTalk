@@ -21,7 +21,8 @@ class Helper {
 
         //notification
         const val BASE_URL = "https://fcm.googleapis.com"
-        const val SERVER_KEY = "AAAAPvL38mg:APA91bHPLAUmJhCTPXKr2O84BmBUnJuJQPG6yRaNhZktXgomLcQjFcvvCFC73xbGgjoHMrL59KfKwiNMZLyjAKNsLsK8fwTcfk4HjHy15LkaR7P0AYHNaOBC9gBiQPgPARfVUW1QvGwv"
+        const val SERVER_KEY =
+            "AAAAPvL38mg:APA91bHPLAUmJhCTPXKr2O84BmBUnJuJQPG6yRaNhZktXgomLcQjFcvvCFC73xbGgjoHMrL59KfKwiNMZLyjAKNsLsK8fwTcfk4HjHy15LkaR7P0AYHNaOBC9gBiQPgPARfVUW1QvGwv"
         const val CONTENT_TYPE = "application/json"
 
         //notification body

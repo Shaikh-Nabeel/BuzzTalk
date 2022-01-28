@@ -72,7 +72,7 @@
         android:paddingStart="5dp"
         android:text="@string/accept_terms_and_conditions"
         android:textColor="@color/white"
-        android:textSize="19sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/googleSignInBtn"
         app:layout_constraintEnd_toEndOf="parent"
@@ -92,14 +92,38 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/checkBoxforPrivacy" />
 
-    <com.google.android.gms.common.SignInButton
+    <LinearLayout
         android:id="@+id/googleSignInBtn"
-        android:layout_width="200dp"
+        android:layout_width="220dp"
         android:layout_height="wrap_content"
+        android:background="@drawable/google_button_bg"
+        android:backgroundTint="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/checkBoxforPrivacy"
-        app:layout_constraintVertical_bias="0.7" />
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/checkBoxforPrivacy"
+            app:layout_constraintVertical_bias="0.7"
+            android:text="@string/sign_in"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:drawablePadding="30dp"
+            android:letterSpacing="0.01"
+            android:padding="8dp"
+            android:gravity="end|center_vertical"
+            app:drawableStartCompat="@drawable/google_logo" />
+
+    </LinearLayout>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

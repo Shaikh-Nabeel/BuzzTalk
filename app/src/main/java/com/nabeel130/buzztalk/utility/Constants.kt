@@ -9,11 +9,14 @@ import android.view.Window
 import android.widget.TextView
 import com.nabeel130.buzztalk.R
 
-class Helper {
+class Constants {
     companion object {
 
         const val TAG = "BuzzReport"
-        const val PREF_KEY = "BuzzTalkKey"
+
+        //preference key
+        const val IMAGE_URL = "IMAGE_URL"
+        const val USER_BIO = "USER_BIO"
         var isOpenedFromProfile = false
 
         //user detail
@@ -28,6 +31,10 @@ class Helper {
         //notification body
         const val MESSAGE = "See new post from"
         const val TOPIC = "/topics/globalPost"
+
+        //storage reference
+        const val POST_IMG = "images/"
+        const val USER_IMG = "profile_pictures/"
 
         val PERMISSIONS_STORAGE_CAMERA = arrayOf(
             Manifest.permission.READ_EXTERNAL_STORAGE,

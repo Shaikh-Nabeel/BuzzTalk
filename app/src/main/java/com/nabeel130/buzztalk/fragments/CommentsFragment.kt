@@ -18,8 +18,8 @@ import com.nabeel130.buzztalk.adapter.ICommentAdapter
 import com.nabeel130.buzztalk.daos.PostDao
 import com.nabeel130.buzztalk.databinding.FragmentCommentsBinding
 import com.nabeel130.buzztalk.models.Comments
-import com.nabeel130.buzztalk.utility.Helper
-import com.nabeel130.buzztalk.utility.Helper.Companion.TAG
+import com.nabeel130.buzztalk.utility.Constants
+import com.nabeel130.buzztalk.utility.Constants.Companion.TAG
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 
@@ -53,11 +53,8 @@ class CommentsFragment : Fragment(), ICommentAdapter {
         postDao = PostDao()
 
         listOfComment = GlobalScope.async(Dispatchers.IO) {
-            Log.d(TAG, "loading post....")
             loadComments()
         }
-        Log.d(TAG, "loading post done......")
-
         adapter = CommentsAdapter(this)
         binding.recyclerViewForComments.layoutManager = LinearLayoutManager(context)
         binding.recyclerViewForComments.adapter = adapter
@@ -85,10 +82,12 @@ class CommentsFragment : Fragment(), ICommentAdapter {
         return postDao.loadComments(postId).await().documents
     }
 
+    private var submitListJob: Job? = null
     private fun submitList() {
 
-        GlobalScope.launch(Dispatchers.Main) {
-            if (listOfComment.await().size > 0 && _binding != null) {
+        submitListJob = GlobalScope.launch(Dispatchers.Main) {
+            if (_binding == null) return@launch
+            if (listOfComment.await().size > 0) {
                 binding.commentBg.visibility = View.GONE
                 binding.noCommentT.visibility = View.GONE
             } else {
@@ -99,28 +98,31 @@ class CommentsFragment : Fragment(), ICommentAdapter {
             binding.noOfComments.text = listOfComment.await().size.toString()
             binding.progressBarComment.visibility = View.INVISIBLE
         }
-
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        try {
+            submitListJob?.cancel()
+            listOfComment.cancel()
+        }catch (e: Exception){
+            e.printStackTrace()
+        }
         _binding = null
-        if (Helper.isOpenedFromProfile) return
+        if (Constants.isOpenedFromProfile) return
         MainActivity.getInstance().visibleComponentOfMainActivity()
     }
 
     override fun onLongClick(commentSnapId: String, commentId: String, position: Int) {
 
         if (commentId != Firebase.auth.currentUser?.uid) {
-            Log.d(TAG, "Comment is not created by user")
             if (createdBy != Firebase.auth.currentUser?.uid) {
-                Log.d(TAG, "Post is created by the user")
                 return
             }
         }
 
         Log.d(TAG, "position: $position, id: $commentSnapId")
-        val dialog = Helper.buildDialogBox(
+        val dialog = Constants.buildDialogBox(
             requireContext(),
             "Are you sure?",
             "Do you want to delete this comment?"

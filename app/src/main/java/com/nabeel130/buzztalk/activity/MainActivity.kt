@@ -39,11 +39,15 @@ import com.nabeel130.buzztalk.fragments.ProfileFragment
 import com.nabeel130.buzztalk.models.Post
 import com.nabeel130.buzztalk.notifications.Notifications
 import com.nabeel130.buzztalk.notifications.PushNotification
-import com.nabeel130.buzztalk.utility.Helper
-import com.nabeel130.buzztalk.utility.Helper.Companion.MESSAGE
-import com.nabeel130.buzztalk.utility.Helper.Companion.TOPIC
+import com.nabeel130.buzztalk.utility.Constants
+import com.nabeel130.buzztalk.utility.Constants.Companion.MESSAGE
+import com.nabeel130.buzztalk.utility.Constants.Companion.TOPIC
+import com.nabeel130.buzztalk.utility.GlideApp
+import com.nabeel130.buzztalk.utility.PreferenceManager
 import com.nabeel130.buzztalk.utility.RetrofitInstance
 import kotlinx.coroutines.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity(), IPostAdapter,
     NavigationView.OnNavigationItemSelectedListener {
@@ -79,6 +83,26 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         binding.customToolB.setTitleTextColor(Color.WHITE)
         setSupportActionBar(binding.customToolB)
 
+        setUpNavigationDrawer()
+
+        binding.createPostBtn.setOnClickListener {
+            createPostLauncher.launch(Intent(this, CreatePostActivity::class.java))
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        }
+
+        try {
+            loadAllPost()
+            setUpNavigationHeader()
+
+            //subscribing to topic to receive notification on current topic
+            FirebaseMessaging.getInstance().subscribeToTopic(TOPIC)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        
+    }
+
+    private fun setUpNavigationDrawer() {
         binding.navigationView.bringToFront()
         toggle = ActionBarDrawerToggle(
             this, binding.drawableLayout, binding.customToolB,
@@ -97,7 +121,9 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
             }
         }
         binding.navigationView.setNavigationItemSelectedListener(this)
+    }
 
+    private fun setUpNavigationHeader() {
         val view = binding.navigationView.getHeaderView(0)
         val profile: ImageView = view.findViewById(R.id.profilePicForMenuBar)
         val userName: TextView = view.findViewById(R.id.userNameForMenuBar)
@@ -106,19 +132,15 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         userName.text = user.displayName
         currentUserId = user.uid
         currentUserName = user.displayName ?: ""
-        currentUserProfileUrl = user.photoUrl.toString()
-        Glide.with(applicationContext).load(user.photoUrl).circleCrop().into(profile)
+        currentUserProfileUrl = PreferenceManager.getString(Constants.IMAGE_URL)
 
-        binding.createPostBtn.setOnClickListener {
-            createPostLauncher.launch(Intent(this, CreatePostActivity::class.java))
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        if (currentUserProfileUrl == user.photoUrl.toString()) {
+            Glide.with(applicationContext).load(currentUserProfileUrl).circleCrop().into(profile)
+        } else {
+            val ref =
+                FirebaseStorage.getInstance().reference.child(Constants.USER_IMG + "/" + currentUserProfileUrl)
+            GlideApp.with(applicationContext).load(ref).circleCrop().into(profile)
         }
-
-        loadAllPost()
-
-        //subscribing to topic to receive notification on current topic
-        FirebaseMessaging.getInstance().subscribeToTopic(TOPIC)
-
     }
 
     private fun sendNotifications(notifications: PushNotification) =
@@ -126,9 +148,9 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
             try {
                 val response = RetrofitInstance.api.postNotification(notifications)
                 if (response.isSuccessful) {
-                    Log.d(Helper.TAG, "Response: $response")
+                    Log.d(Constants.TAG, "Response: $response")
                 } else {
-                    Log.d(Helper.TAG, "Response: ${response.errorBody()}")
+                    Log.d(Constants.TAG, "Response: ${response.errorBody()}")
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -141,11 +163,11 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         val query = postCollection.orderBy("createdAt", Query.Direction.DESCENDING)
         val recyclerViewOption =
             FirestoreRecyclerOptions.Builder<Post>().setQuery(query, Post::class.java).build()
-        adapter = PostAdapter(recyclerViewOption, this)
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         (binding.recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+        adapter = PostAdapter(recyclerViewOption, this)
         binding.recyclerView.adapter = adapter
-
+        Log.d(Constants.TAG, "Reached here..............")
     }
 
     override fun onStart() {
@@ -192,10 +214,10 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
                     ).show()
                     binding.recyclerView.scrollToPosition(0);
                     sendNotifications(PushNotification(getNotificationBody(), TOPIC))
-                    Log.d(Helper.TAG, "Found data")
+                    Log.d(Constants.TAG, "Found data")
                 }
             } catch (e: Exception) {
-                Log.d(Helper.TAG, "data not found")
+                Log.d(Constants.TAG, "data not found")
                 e.printStackTrace()
             }
         }
@@ -266,7 +288,7 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         commentsFragment.arguments = bundle
         binding.recyclerView.visibility = View.GONE
         binding.createPostBtn.visibility = View.GONE
-        Helper.isOpenedFromProfile = false
+        Constants.isOpenedFromProfile = false
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.frameLayoutForFragments, commentsFragment)
             addToBackStack(null)
@@ -276,7 +298,7 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
 
     override fun onDeletePostClicked(postId: String, uuid: String?) {
 
-        val dialog = Helper.buildDialogBox(
+        val dialog = Constants.buildDialogBox(
             this,
             getString(R.string.areYouSure),
             getString(R.string.dialog_text_1)
@@ -289,10 +311,10 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
             if (uuid != null) {
                 val storageRef = FirebaseStorage.getInstance().getReference("images/$uuid")
                 storageRef.delete().addOnSuccessListener {
-                    Log.d(Helper.TAG, "Image delete uuid: $uuid")
+                    Log.d(Constants.TAG, "Image delete uuid: $uuid")
                     deletePostData(postId)
                 }.addOnFailureListener {
-                    Log.d(Helper.TAG, it.message.toString())
+                    Log.d(Constants.TAG, it.message.toString())
                 }
             } else {
                 deletePostData(postId)
@@ -312,7 +334,7 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
                 Toast.makeText(applicationContext, "Deleted", Toast.LENGTH_SHORT).show()
             else
                 Toast.makeText(applicationContext, "Couldn't delete", Toast.LENGTH_SHORT).show()
-            Log.d(Helper.TAG, "Post deleted status: " + it.exception?.message)
+            Log.d(Constants.TAG, "Post deleted status: " + it.exception?.message)
         }
     }
 
@@ -368,7 +390,7 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
 
     @SuppressLint("SetTextI18n")
     private fun singOut() {
-        val dialog = Helper.buildDialogBox(
+        val dialog = Constants.buildDialogBox(
             this,
             getString(R.string.logout),
             getString(R.string.dialog_text_2)

@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.core.animation.doOnEnd
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -24,7 +25,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.nabeel130.buzztalk.R
 import com.nabeel130.buzztalk.models.Post
 import com.nabeel130.buzztalk.utility.GlideApp
-import com.nabeel130.buzztalk.utility.Helper
+import com.nabeel130.buzztalk.utility.Constants
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -94,7 +95,7 @@ class PostAdapter(options: FirestoreRecyclerOptions<Post>, private val listener:
 //        animationSet2.playTogether(scaleX2, scaleY2)
 //        animationSet2.duration = 150
 //        animationSet2.start()
-//        Log.d(Helper.TAG, "first animation")
+//        Log.d(Constants.TAG, "first animation")
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -129,9 +130,11 @@ class PostAdapter(options: FirestoreRecyclerOptions<Post>, private val listener:
         if (model.imageUuid != null) {
             holder.progress.visibility = View.VISIBLE
             holder.postImage.visibility = View.VISIBLE
-            val ref = storageRef.child("images/${model.imageUuid}")
+            val ref = storageRef.child("${Constants.POST_IMG}${model.imageUuid}")
+            Log.d(Constants.TAG, "$ref")
             GlideApp.with(holder.postImage.context)
-                .load(ref).override(Target.SIZE_ORIGINAL)
+                .load(ref)
+                .fitCenter()
                 .listener(object : RequestListener<Drawable> {
                     override fun onLoadFailed(
                         e: GlideException?, model: Any?, target: Target<Drawable>?,

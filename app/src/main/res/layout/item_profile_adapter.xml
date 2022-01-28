@@ -6,7 +6,8 @@
     android:layout_margin="2dp"
     android:background="@drawable/border_for_post_text"
     android:backgroundTint="@color/matt_black"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="10dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -47,7 +48,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
         android:background="@drawable/post_text_background"
         android:orientation="vertical">
 
@@ -65,10 +65,12 @@
         <ImageView
             android:id="@+id/postImage_Profile"
             android:layout_width="match_parent"
-            android:layout_height="450dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:contentDescription="@string/post"
             android:padding="1dp"
+            android:minHeight="300dp"
+            android:adjustViewBounds="true"
             android:src="@drawable/galler_image_bg_24"
             tools:ignore="ImageContrastCheck" />
     </LinearLayout>
@@ -76,7 +78,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
@@ -86,7 +88,7 @@
             android:id="@+id/likeBtn_Profile"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/like_toggle_selector"
             android:text="@string/space"
             android:textOff=""
@@ -104,7 +106,7 @@
             android:id="@+id/likeCount_Profile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
+            android:layout_marginStart="8dp"
             android:padding="3dp"
             android:textColor="@color/white_1"
             android:textSize="14sp"

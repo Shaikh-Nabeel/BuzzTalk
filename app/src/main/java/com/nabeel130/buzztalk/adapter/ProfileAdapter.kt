@@ -18,7 +18,7 @@ import com.google.firebase.ktx.Firebase
 import com.nabeel130.buzztalk.R
 import com.nabeel130.buzztalk.models.Post
 import com.nabeel130.buzztalk.utility.GlideApp
-import com.nabeel130.buzztalk.utility.Helper.Companion.TAG
+import com.nabeel130.buzztalk.utility.Constants.Companion.TAG
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -81,6 +81,7 @@ class ProfileAdapter(
     @SuppressLint("SimpleDateFormat", "SetTextI18n")
     override fun onBindViewHolder(holder: ProfileViewHolder, position: Int) {
 
+        Log.d(TAG, listOfId.toString())
         val model = differ.currentList[position]
 
         val dateFormat: DateFormat = SimpleDateFormat("MMM dd, yyyy h:mm a")
@@ -108,6 +109,7 @@ class ProfileAdapter(
             val ref = storageRef.child("images/${model.imageUuid}")
             GlideApp.with(holder.postImage.context)
                 .load(ref)
+                .fitCenter()
                 .into(holder.postImage)
         } else {
             holder.postImage.visibility = View.GONE
@@ -120,11 +122,8 @@ class ProfileAdapter(
                 when (item.itemId) {
                     R.id.deletePost -> {
                         listener.onDeletePostClicked(listOfId[position], holder.adapterPosition)
-                        Log.d(
-                            TAG,
-                            "adapater position: ${holder.adapterPosition}, position: $position, ${listOfId[position]}"
-                        )
-                        listOfId.removeAt(position)
+                        Log.d(TAG, "adapater position: ${holder.adapterPosition}, position: $position, ${listOfId[position]}")
+//                        listOfId.removeAt(position)
                         true
                     }
                     R.id.sharePost -> {

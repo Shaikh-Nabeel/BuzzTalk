@@ -1,7 +1,7 @@
 package com.nabeel130.buzztalk.notifications
 
-import com.nabeel130.buzztalk.utility.Helper.Companion.CONTENT_TYPE
-import com.nabeel130.buzztalk.utility.Helper.Companion.SERVER_KEY
+import com.nabeel130.buzztalk.utility.Constants.Companion.CONTENT_TYPE
+import com.nabeel130.buzztalk.utility.Constants.Companion.SERVER_KEY
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body

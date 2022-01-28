@@ -16,8 +16,8 @@ class UserPostDao {
     private val userPostCollection = db.collection("UserPost")
     private val userId = Firebase.auth.currentUser!!.uid
 
-    fun addUserPost(userPost: UserPost){
-        GlobalScope.launch(Dispatchers.IO){
+    fun addUserPost(userPost: UserPost) {
+        GlobalScope.launch(Dispatchers.IO) {
             userPostCollection.document(userId).set(userPost)
         }
     }
@@ -30,16 +30,4 @@ class UserPostDao {
         return userPostCollection.document(uid).get()
     }
 
-//    suspend fun getAllPost(uids: ArrayList<String>): ArrayList<Post> {
-//        val list = ArrayList<Post>()
-//        for(uid in uids){
-//            postDao.getPostById(uid).addOnCompleteListener {
-//                if(it.isSuccessful){
-//                    val post = it.result.toObject(Post::class.java)!!
-//                    list.add(post)
-//                }
-//            }
-//        }
-//        return list
-//    }
 }

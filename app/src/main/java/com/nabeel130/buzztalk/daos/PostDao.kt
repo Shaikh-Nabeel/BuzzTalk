@@ -22,40 +22,40 @@ class PostDao {
     private val db = FirebaseFirestore.getInstance()
     val postCollection = db.collection("posts")
     private val auth = Firebase.auth
-    private val userDao = UserDao()
+    private val mCurrentUser = auth.currentUser!!
     private val userPostDao = UserPostDao()
 
     companion object {
         lateinit var lastPost: Post
     }
 
-    fun addPost(text: String, uuid: String?){
+    fun addPost(text: String, uuid: String?) {
         GlobalScope.launch(Dispatchers.IO) {
             val createdAt = System.currentTimeMillis()
-            lateinit var createdBy: User
-            userDao.getUserById(auth.currentUser!!.uid).addOnCompleteListener{ user ->
-                if (user.isSuccessful) {
-                    createdBy = user.result.toObject(User::class.java)!!
-                    val post = Post(text,createdBy,createdAt,uuid)
-                    lastPost = post
-                    postCollection.document().set(post)
+            val createdBy = User(
+                uid = mCurrentUser.uid,
+                userName = mCurrentUser.displayName,
+                imageUrl = mCurrentUser.photoUrl.toString()
+            )
+            val post = Post(text, createdBy, createdAt, uuid)
+            lastPost = post
+            postCollection.document().set(post)
 
-                    //adding current post id in "UserPost" collection
-                    userPostDao.getUserPost().addOnCompleteListener { userSnapshot ->
-                        if(userSnapshot.isSuccessful){
-                            val userPost = if(userSnapshot.result.exists()){
-                                userSnapshot.result.toObject(UserPost::class.java)!!
-                            }else{
-                                UserPost()
-                            }
-                            getLastPostId().addOnCompleteListener {
-                                if(it.isSuccessful){
-                                    val documents = it.result.documents
-                                    if(documents.size > 0){
-                                        userPost.listOfPosts.add(documents[0].id)
-                                        userPostDao.addUserPost(userPost)
-                                    }
-                                }
+            //adding current post id in "UserPost" collection
+            userPostDao.getUserPost().addOnCompleteListener { userSnapshot ->
+                if (userSnapshot.isSuccessful) {
+                    val userPost = if (userSnapshot.result.exists()) {
+                        userSnapshot.result.toObject(UserPost::class.java)!!
+                    } else {
+                        UserPost()
+                    }
+                    //fetching last post id
+                    getLastPostId().addOnCompleteListener {
+                        if (it.isSuccessful) {
+                            val documents = it.result.documents
+                            if (documents.size > 0) {
+                                userPost.listOfPosts.add(documents[0].id)
+                                userPostDao.addUserPost(userPost)
                             }
                         }
                     }
@@ -67,21 +67,22 @@ class PostDao {
     private fun getLastPostId(): Task<QuerySnapshot> {
         return postCollection.whereEqualTo("createdAt", lastPost.createdAt)
             .whereEqualTo("postText", lastPost.postText)
+            .whereEqualTo("imageUuid", lastPost.imageUuid)
             .get()
     }
 
-    fun deletePost(uid: String): Task<Void>{
-        return runBlocking{
+    fun deletePost(uid: String): Task<Void> {
+        return runBlocking {
 
-        GlobalScope.launch(Dispatchers.IO){
-            userPostDao.getUserPost().addOnCompleteListener {
-                if(it.isSuccessful){
-                    val userPost = it.result.toObject(UserPost::class.java)!!
-                    userPost.listOfPosts.remove(uid)
-                    userPostDao.addUserPost(userPost)
+            GlobalScope.launch(Dispatchers.IO) {
+                userPostDao.getUserPost().addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        val userPost = it.result.toObject(UserPost::class.java)!!
+                        userPost.listOfPosts.remove(uid)
+                        userPostDao.addUserPost(userPost)
+                    }
                 }
             }
-        }
             return@runBlocking postCollection.document(uid).delete()
         }
     }
@@ -121,7 +122,7 @@ class PostDao {
             .set(comment)
     }
 
-    fun likedPost(post: Post, postId: String): Task<Void>{
+    fun likedPost(post: Post, postId: String): Task<Void> {
         return postCollection.document(postId).set(post)
     }
 

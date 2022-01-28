@@ -1,13 +1,11 @@
 package com.nabeel130.buzztalk.activity
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
@@ -27,6 +25,10 @@ import com.nabeel130.buzztalk.daos.UserDao
 import com.nabeel130.buzztalk.databinding.ActivitySignInBinding
 import com.nabeel130.buzztalk.models.User
 import androidx.core.content.ContextCompat
+import com.nabeel130.buzztalk.utility.Constants
+import com.nabeel130.buzztalk.utility.PreferenceManager
+import kotlinx.coroutines.*
+import kotlinx.coroutines.tasks.await
 
 
 class SignInActivity : AppCompatActivity() {
@@ -34,13 +36,16 @@ class SignInActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySignInBinding
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var auth: FirebaseAuth
+    private var TAG = "SIGN_IN_LOG"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySignInBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setStatusBarGradiant(this)
 
+        PreferenceManager(this)
+        setStatusBarGradiant(this)
+        Log.d(TAG, "in on create method sign in")
         auth = Firebase.auth
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -69,7 +74,7 @@ class SignInActivity : AppCompatActivity() {
 
     }
 
-    fun setStatusBarGradiant(activity: Activity) {
+    private fun setStatusBarGradiant(activity: Activity) {
         val window = activity.window
         val background =
             ContextCompat.getDrawable(applicationContext, R.drawable.sign_in_background)
@@ -102,22 +107,58 @@ class SignInActivity : AppCompatActivity() {
 
         auth.signInWithCredential(credential).addOnCompleteListener(this) {
             if (it.isSuccessful) {
-                val user = auth.currentUser
-                updateUI(user)
+                val user = auth.currentUser ?: return@addOnCompleteListener
+
+                GlobalScope.launch {
+                    if (!isAccountExistAsync(user).await()) {
+                        Log.d(TAG, "Account does not exit....")
+                        PreferenceManager.setString(Constants.IMAGE_URL, user.photoUrl.toString())
+                        val userObj =
+                            User(
+                                user.uid,
+                                user.email,
+                                user.displayName,
+                                user.photoUrl.toString(),
+                                ""
+                            )
+
+                        val userDao = UserDao()
+                        userDao.addUser(userObj)
+                    }
+                    Log.d(TAG, "skipping....")
+                    updateUI(user)
+                }
             } else {
                 Toast.makeText(applicationContext, "Couldn't sign in!", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
+    private fun isAccountExistAsync(user: FirebaseUser): Deferred<Boolean> {
+        val userDao = UserDao()
+        val res =  GlobalScope.async(Dispatchers.Main) {
+            var temp = false
+            Log.d(TAG, "Temp value 0: $temp")
+            val currUser = userDao.getUserById(user.uid).await().toObject(User::class.java)
+            if (currUser != null) {
+                temp = true
+                PreferenceManager.setString(Constants.IMAGE_URL, currUser.imageUrl ?: "")
+                PreferenceManager.setString(Constants.USER_BIO, currUser.bio ?: "")
+            }
+            Log.d(TAG, "Temp value 1 : $temp")
+
+            return@async temp
+        }
+        return res
+    }
+
     private fun updateUI(user: FirebaseUser?) {
         if (user != null) {
-            val userObj = User(user.uid, user.email, user.displayName, user.photoUrl.toString())
-            val userDao = UserDao()
-            userDao.addUser(userObj)
+            Log.d(TAG, "updating UI")
             startActivity(Intent(this, MainActivity::class.java))
             finish()
         } else {
+            PreferenceManager.deletePref()
             googleSignInClient.signOut()
             binding.googleSignInBtn.visibility = View.VISIBLE
             binding.progressBarLogin.visibility = View.GONE

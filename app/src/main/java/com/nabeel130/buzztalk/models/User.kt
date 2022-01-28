@@ -4,5 +4,6 @@ data class User(
     val uid: String = "",
     val email: String? = "",
     val userName: String? = "",
-    val imageUrl: String? = ""
+    val imageUrl: String? = "",
+    val bio: String? = null
 )

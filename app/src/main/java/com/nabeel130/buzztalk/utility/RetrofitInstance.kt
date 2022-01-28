@@ -1,7 +1,7 @@
 package com.nabeel130.buzztalk.utility
 
 import com.nabeel130.buzztalk.notifications.NotificationAPI
-import com.nabeel130.buzztalk.utility.Helper.Companion.BASE_URL
+import com.nabeel130.buzztalk.utility.Constants.Companion.BASE_URL
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

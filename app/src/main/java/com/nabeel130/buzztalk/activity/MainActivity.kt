@@ -36,6 +36,7 @@ import com.nabeel130.buzztalk.daos.PostDao
 import com.nabeel130.buzztalk.databinding.ActivityMainBinding
 import com.nabeel130.buzztalk.fragments.CommentsFragment
 import com.nabeel130.buzztalk.fragments.ProfileFragment
+import com.nabeel130.buzztalk.fragments.ProfileFragment2
 import com.nabeel130.buzztalk.models.Post
 import com.nabeel130.buzztalk.notifications.Notifications
 import com.nabeel130.buzztalk.notifications.PushNotification

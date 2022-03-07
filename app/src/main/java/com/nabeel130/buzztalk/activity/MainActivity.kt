@@ -17,6 +17,8 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.view.GravityCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.bumptech.glide.Glide
@@ -35,6 +37,7 @@ import com.nabeel130.buzztalk.adapter.PostAdapter
 import com.nabeel130.buzztalk.daos.PostDao
 import com.nabeel130.buzztalk.databinding.ActivityMainBinding
 import com.nabeel130.buzztalk.fragments.CommentsFragment
+import com.nabeel130.buzztalk.fragments.HomeFragment
 import com.nabeel130.buzztalk.fragments.ProfileFragment
 import com.nabeel130.buzztalk.fragments.ProfileFragment2
 import com.nabeel130.buzztalk.models.Post
@@ -50,13 +53,12 @@ import kotlinx.coroutines.*
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MainActivity : AppCompatActivity(), IPostAdapter,
+class MainActivity : AppCompatActivity(),
     NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var adapter: PostAdapter
-    private lateinit var postDao: PostDao
-    private lateinit var likeAdapter: LikeAdapter
+
+
     private lateinit var toggle: ActionBarDrawerToggle
 
     companion object {
@@ -84,24 +86,43 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         binding.customToolB.setTitleTextColor(Color.WHITE)
         setSupportActionBar(binding.customToolB)
 
-        setUpNavigationDrawer()
-
-        binding.createPostBtn.setOnClickListener {
-            createPostLauncher.launch(Intent(this, CreatePostActivity::class.java))
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-        }
-
         try {
-            loadAllPost()
+            setUpNavigationDrawer()
             setUpNavigationHeader()
+//            binding.bottomNavigation.setItemSelected(R.id.homeBtn,true)
+//            binding.bottomNavigation.setOnItemSelectedListener {
+//                when(it){
+//                    R.id.homeBtn -> supportFragmentManager.popBackStack()
+//                    R.id.notification -> Log.d("BottomNavTest", "notification")
+//                    R.id.profile -> loadFragmentWithBack(ProfileFragment())
+//                }
+//            }
+            loadFragment(HomeFragment())
 
             //subscribing to topic to receive notification on current topic
             FirebaseMessaging.getInstance().subscribeToTopic(TOPIC)
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
         
     }
+
+    private fun loadFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction().apply {
+            add(R.id.frameLayoutForFragments, fragment)
+            commit()
+        }
+    }
+
+    private fun loadFragmentWithBack(fragment: Fragment){
+        supportFragmentManager.beginTransaction().apply {
+            add(R.id.frameLayoutForFragments, fragment)
+            addToBackStack(null)
+            commit()
+        }
+    }
+
 
     private fun setUpNavigationDrawer() {
         binding.navigationView.bringToFront()
@@ -144,217 +165,11 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         }
     }
 
-    private fun sendNotifications(notifications: PushNotification) =
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response = RetrofitInstance.api.postNotification(notifications)
-                if (response.isSuccessful) {
-                    Log.d(Constants.TAG, "Response: $response")
-                } else {
-                    Log.d(Constants.TAG, "Response: ${response.errorBody()}")
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-
-    private fun loadAllPost() {
-        postDao = PostDao()
-        val postCollection = postDao.postCollection
-        val query = postCollection.orderBy("createdAt", Query.Direction.DESCENDING)
-        val recyclerViewOption =
-            FirestoreRecyclerOptions.Builder<Post>().setQuery(query, Post::class.java).build()
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
-        (binding.recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-        adapter = PostAdapter(recyclerViewOption, this)
-        binding.recyclerView.adapter = adapter
-        Log.d(Constants.TAG, "Reached here..............")
-    }
-
-    override fun onStart() {
-        super.onStart()
-        adapter.startListening()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        //code to show posting message while post(image) is being posted
-        if (!isPostingCompleted) {
-            binding.postingMssg.visibility = View.VISIBLE
-            GlobalScope.launch(Dispatchers.IO) {
-                while (true) {
-                    if (isPostingCompleted) {
-                        withContext(Dispatchers.Main) {
-                            binding.postingMssg.visibility = View.GONE
-                            Toast.makeText(
-                                applicationContext,
-                                "Posted", Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                        //sending notification when post is uploaded
-                        sendNotifications(PushNotification(getNotificationBody(), TOPIC))
-                        break
-                    }
-                    delay(500)
-                }
-            }
-        }
-    }
-
-    private val createPostLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult(),
-    ) {
-        if (it.resultCode == RESULT_OK) {
-            try {
-                val data = it.data!!
-                if (data.getStringExtra("post").equals("true")) {
-                    Toast.makeText(
-                        applicationContext,
-                        "Posted", Toast.LENGTH_SHORT
-                    ).show()
-                    binding.recyclerView.scrollToPosition(0);
-                    sendNotifications(PushNotification(getNotificationBody(), TOPIC))
-                    Log.d(Constants.TAG, "Found data")
-                }
-            } catch (e: Exception) {
-                Log.d(Constants.TAG, "data not found")
-                e.printStackTrace()
-            }
-        }
-    }
-
-    private fun getNotificationBody(): Notifications {
-        return Notifications(
-            currentUserName,
-            "$MESSAGE $currentUserName",
-            currentUserProfileUrl,
-            currentUserId
-        )
-    }
-
-    override fun onStop() {
-        super.onStop()
-        adapter.stopListening()
-    }
-
-    fun visibleComponentOfMainActivity() {
-        binding.recyclerView.visibility = View.VISIBLE
-        binding.createPostBtn.visibility = View.VISIBLE
-    }
-
-    override fun onPostLiked(postId: String) {
-        GlobalScope.launch(Dispatchers.IO) {
-            postDao.likedPost(postId)
-        }
-    }
-
-    private var listOfLikedUser: ArrayList<String> = ArrayList()
-
-    //function to show name of user who have liked the current post
-    @SuppressLint("NotifyDataSetChanged")
-    override fun onLikeCountClicked(postId: String) {
-
-        binding.progressBarForLikes.visibility = View.VISIBLE
-        binding.relativeLayoutForLikes.visibility = View.VISIBLE
-        binding.recyclerView.visibility = View.GONE
-        binding.createPostBtn.visibility = View.GONE
-
-        binding.closeBtnForLikes.setOnClickListener {
-            binding.relativeLayoutForLikes.visibility = View.GONE
-            binding.recyclerView.visibility = View.VISIBLE
-            binding.createPostBtn.visibility = View.VISIBLE
-            listOfLikedUser.clear()
-            likeAdapter.notifyDataSetChanged()
-        }
-
-        postDao.getPostById(postId).addOnCompleteListener {
-            if (it.isSuccessful) {
-                val post = it.result.toObject(Post::class.java)!!
-                listOfLikedUser = post.likedBy
-                likeAdapter = LikeAdapter(listOfLikedUser)
-                binding.recyclerViewForLike.adapter = likeAdapter
-                binding.progressBarForLikes.visibility = View.GONE
-                binding.recyclerViewForLike.layoutManager =
-                    LinearLayoutManager(binding.relativeLayoutForLikes.context)
-            }
-        }
-    }
-
-    override fun onPostCommentPressed(postId: String, createdBy: String) {
-        val bundle = Bundle()
-        bundle.putString("postId", postId)
-        bundle.putString("createdBy", createdBy)
-        val commentsFragment = CommentsFragment()
-        commentsFragment.arguments = bundle
-        binding.recyclerView.visibility = View.GONE
-        binding.createPostBtn.visibility = View.GONE
-        Constants.isOpenedFromProfile = false
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.frameLayoutForFragments, commentsFragment)
-            addToBackStack(null)
-            commit()
-        }
-    }
-
-    override fun onDeletePostClicked(postId: String, uuid: String?) {
-
-        val dialog = Constants.buildDialogBox(
-            this,
-            getString(R.string.areYouSure),
-            getString(R.string.dialog_text_1)
-        )
-        val confirmBtn: Button = dialog.findViewById(R.id.confirm_button)
-        val denyBtn: Button = dialog.findViewById(R.id.deny_button)
-
-        confirmBtn.setOnClickListener {
-            dialog.dismiss()
-            if (uuid != null) {
-                val storageRef = FirebaseStorage.getInstance().getReference("images/$uuid")
-                storageRef.delete().addOnSuccessListener {
-                    Log.d(Constants.TAG, "Image delete uuid: $uuid")
-                    deletePostData(postId)
-                }.addOnFailureListener {
-                    Log.d(Constants.TAG, it.message.toString())
-                }
-            } else {
-                deletePostData(postId)
-            }
-        }
-
-        denyBtn.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialog.show()
-    }
-
-    private fun deletePostData(postId: String) {
-        postDao.deletePost(postId).addOnCompleteListener {
-            if (it.isSuccessful)
-                Toast.makeText(applicationContext, "Deleted", Toast.LENGTH_SHORT).show()
-            else
-                Toast.makeText(applicationContext, "Couldn't delete", Toast.LENGTH_SHORT).show()
-            Log.d(Constants.TAG, "Post deleted status: " + it.exception?.message)
-        }
-    }
-
-    override fun onShareClicked(text: String, userName: String) {
-        val intent = Intent(Intent.ACTION_SEND).setType("text/plain")
-        intent.putExtra(Intent.EXTRA_SUBJECT, "BuzzTalk")
-        intent.putExtra(Intent.EXTRA_TEXT, text)
-        startActivity(Intent.createChooser(intent, "Post from $userName"))
-    }
-
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         binding.drawableLayout.closeDrawer(binding.navigationView)
         return when (item.itemId) {
             R.id.profileDetails -> {
-                if (binding.recyclerView.visibility == View.GONE)
-                    return true
                 val profileFragment = ProfileFragment()
-                binding.recyclerView.visibility = View.GONE
-                binding.createPostBtn.visibility = View.GONE
                 supportFragmentManager.beginTransaction().apply {
                     add(R.id.frameLayoutForFragments, profileFragment)
                     addToBackStack(null)

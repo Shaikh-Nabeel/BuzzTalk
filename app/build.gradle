@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId "com.nabeel130.buzztalk"
-        minSdk 21
+        minSdk 23
         targetSdk 30
         versionCode 1
         versionName "1.0"
@@ -82,5 +82,8 @@ dependencies {
 
     //image compression
     implementation 'id.zelory:compressor:3.0.1'
+
+    //bottom navigation
+    implementation 'com.ismaeldivita.chipnavigation:chip-navigation-bar:1.3.4'
 
 }

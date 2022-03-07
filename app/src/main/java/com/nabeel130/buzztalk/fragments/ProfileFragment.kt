@@ -149,8 +149,6 @@ class ProfileFragment : Fragment(), IProfileAdapter {
             e.printStackTrace()
         }
         _binding = null
-        MainActivity.getInstance().visibleComponentOfMainActivity()
-
     }
 
     override fun onPostLiked(post: Post, postId: String) {
@@ -192,13 +190,9 @@ class ProfileFragment : Fragment(), IProfileAdapter {
 
         Constants.isOpenedFromProfile = true
         parentFragmentManager.beginTransaction().apply {
-            Log.d(TAG, "reacheddddddddddddddd 1")
             add(R.id.frameLayoutForFragments, commentsFragment)
-            Log.d(TAG, "reacheddddddddddddddd 2")
             addToBackStack(null)
-            Log.d(TAG, "reacheddddddddddddddd 3")
             commit()
-            Log.d(TAG, "reacheddddddddddddddd 4")
         }
     }
 

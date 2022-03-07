@@ -109,8 +109,6 @@ class CommentsFragment : Fragment(), ICommentAdapter {
             e.printStackTrace()
         }
         _binding = null
-        if (Constants.isOpenedFromProfile) return
-        MainActivity.getInstance().visibleComponentOfMainActivity()
     }
 
     override fun onLongClick(commentSnapId: String, commentId: String, position: Int) {

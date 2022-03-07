@@ -18,7 +18,8 @@
         app:headerLayout="@layout/layout_menu_top"
         app:itemIconTint="@color/white"
         app:itemTextColor="@color/white_1"
-        app:menu="@menu/menu_main_activity" />
+        app:menu="@menu/menu_main_activity"
+        android:visibility="gone"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -34,8 +35,6 @@
             android:layout_alignParentEnd="true"
             android:background="@color/matt_black"
             android:maxHeight="?attr/actionBarSize"
-            app:navigationIcon="@drawable/ic_baseline_person_24"
-
             />
 
         <FrameLayout
@@ -45,118 +44,25 @@
             android:layout_below="@+id/customToolB"
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true" />
+            android:layout_above="@+id/bottomNavigation" />
 
-        <RelativeLayout
-            android:id="@+id/relativeLayoutForLikes"
+        <com.ismaeldivita.chipnavigation.ChipNavigationBar
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/customToolB"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
+            android:layout_height="56dp"
+            app:cnb_menuResource="@menu/menu_bottom_navigation"
             android:layout_alignParentBottom="true"
-            android:background="@drawable/likes_view_background"
-            android:visibility="gone">
-
-            <TextView
-                android:id="@+id/likeTxtView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_margin="8dp"
-                android:layout_toStartOf="@+id/closeBtnForLikes"
-                android:text="@string/likes"
-                android:textColor="@color/white"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:id="@+id/closeBtnForLikes"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentEnd="true"
-                android:layout_margin="5dp"
-                android:contentDescription="@string/app_name"
-                android:src="@drawable/ic_baseline_close_24" />
-
-            <View
-                android:id="@+id/viewDivider"
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_below="@id/likeTxtView"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentEnd="true"
-                android:background="@color/white" />
-
-            <ProgressBar
-                android:id="@+id/progressBarForLikes"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:indeterminate="true"
-                android:indeterminateTint="@color/white"
-                android:visibility="gone" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewForLike"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/viewDivider"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentEnd="true"
-                android:layout_gravity="top"
-                android:paddingTop="10dp" />
-
-        </RelativeLayout>
-
-        <TextView
-            android:id="@+id/postingMssg"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/customToolB"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
-            android:background="#169300"
-            android:gravity="center"
-            android:text="@string/posting"
-            android:textColor="@color/white"
-            android:visibility="gone" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/postingMssg"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:nestedScrollingEnabled="false"
-            tools:listitem="@layout/recycler_view_item" />
-
-
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-            android:id="@+id/createPostBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginEnd="30dp"
-            android:layout_marginBottom="30dp"
-            android:backgroundTint="#494747"
-            android:contentDescription="@string/app_name"
-            android:paddingStart="10dp"
-            android:paddingTop="10dp"
-            android:paddingEnd="15dp"
-            android:paddingBottom="10dp"
-            android:text="@string/post"
-            android:textAppearance="@style/TextStyle"
-            android:textStyle="bold"
-            app:icon="@drawable/ic_baseline_add_24"
-            app:iconTint="@color/white"
-            tools:ignore="TextContrastCheck" />
+            app:cnb_orientationMode="horizontal"
+            app:cnb_addBottomInset="false"
+            app:cnb_addLeftInset="false"
+            app:cnb_addRightInset="false"
+            app:cnb_addTopInset="false"
+            app:cnb_unselectedColor="@color/white"
+            app:cnb_radius="12dp"
+            app:cnb_iconSize="24dp"
+            android:id="@+id/bottomNavigation"
+            android:background="@color/matt_black"
+            android:visibility="gone"
+            />
 
     </RelativeLayout>
 </androidx.drawerlayout.widget.DrawerLayout>

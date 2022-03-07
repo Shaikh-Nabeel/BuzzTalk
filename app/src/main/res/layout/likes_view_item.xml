@@ -3,8 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="1dp"
-    android:background="@color/matt_black"
+    android:layout_margin="4dp"
+    android:elevation="10dp"
+    android:background="@drawable/likes_view_background"
     android:padding="14dp">
 
     <ImageView

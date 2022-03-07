@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/homeBtn"
+        android:icon="@drawable/home_outline"
+        app:cnb_iconColor="@color/purple"
+        app:cnb_backgroundColor="@color/purple_1"
+        app:cnb_textColor="@color/purple"
+        android:title="@string/home" />
+
+    <item
+        android:id="@+id/notification"
+        android:icon="@drawable/like_button_outline"
+        app:cnb_iconColor="@color/purple"
+        app:cnb_backgroundColor="@color/purple_1"
+        app:cnb_textColor="@color/purple"
+        android:title="@string/notification" />
+
+    <item
+        android:id="@+id/profile"
+        android:icon="@drawable/user_outline"
+        android:iconTint="@color/white"
+        app:cnb_iconColor="@color/purple"
+        app:cnb_backgroundColor="@color/purple_1"
+        app:cnb_textColor="@color/purple"
+        android:title="@string/profile" />
+</menu>

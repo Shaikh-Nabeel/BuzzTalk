@@ -154,8 +154,6 @@ class ProfileFragment2 : Fragment(), IProfileAdapter {
             e.printStackTrace()
         }
         _binding = null
-        MainActivity.getInstance().visibleComponentOfMainActivity()
-
     }
 
     override fun onPostLiked(post: Post, postId: String) {

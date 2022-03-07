@@ -35,4 +35,6 @@
     <string name="no_comments">No Comments</string>
     <string name="report">report</string>
     <string name="sign_in">Sign in</string>
+    <string name="home">Home</string>
+    <string name="notification">Notification</string>
 </resources>

@@ -164,10 +164,14 @@ class MainActivity : AppCompatActivity(), IPostAdapter,
         val query = postCollection.orderBy("createdAt", Query.Direction.DESCENDING)
         val recyclerViewOption =
             FirestoreRecyclerOptions.Builder<Post>().setQuery(query, Post::class.java).build()
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        val linearLayoutManager = LinearLayoutManager(this)
+        binding.recyclerView.layoutManager = linearLayoutManager
         (binding.recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         adapter = PostAdapter(recyclerViewOption, this)
         binding.recyclerView.adapter = adapter
+        query.addSnapshotListener { _, _ ->
+            linearLayoutManager.scrollToPositionWithOffset(0,0)
+        }
         Log.d(Constants.TAG, "Reached here..............")
     }
 

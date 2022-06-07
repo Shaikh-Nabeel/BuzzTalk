@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -63,44 +64,53 @@ class ProfileFragment : Fragment(), IProfileAdapter {
 
             //fetching all post id of post, posted by current user
             val userPostDao = UserPostDao()
+            postDao = PostDao()
             binding.progressBarForProfile.visibility = View.VISIBLE
-            GlobalScope.launch(Dispatchers.IO) {
-                userPostDao.getUserPost().addOnCompleteListener {
-                    if (it.isSuccessful && _binding != null) {
-                        if (!it.result.exists()) return@addOnCompleteListener
-                        val userPost = it.result.toObject(UserPost::class.java)!!
-                        binding.numberOfPost.text = "${userPost.listOfPosts.size}\nPosts"
+            userPostDao.getUserPost().addOnCompleteListener {
+                if (it.isSuccessful && _binding != null) {
+                    if (!it.result.exists()) return@addOnCompleteListener
+                    val userPost = it.result.toObject(UserPost::class.java)!!
+                    binding.numberOfPost.text = "${userPost.listOfPosts.size}\nPosts"
 
-                        //reversing list to sort post according to date (descending order)
-                        list = if (userPost.listOfPosts.size <= 1) {
-                            userPost.listOfPosts
-                        } else {
-                            userPost.listOfPosts.reversed() as ArrayList
-                        }
-
-                        listOfPost = GlobalScope.async(Dispatchers.IO) {
-                            val pList = loadPost(list)
-                            withContext(Dispatchers.Main){
-                                binding.progressBarForProfile.visibility = View.GONE
-                                profileAdapter.differ.submitList(pList)
-                            }
-                            return@async pList
-                        }
-
-                        GlobalScope.launch(Dispatchers.Main) {
-                            profileAdapter = ProfileAdapter(list, this@ProfileFragment)
-                            binding.recyclerViewForProfile.adapter = profileAdapter
-                            binding.recyclerViewForProfile.layoutManager = LinearLayoutManager(context)
-                            (binding.recyclerViewForProfile.itemAnimator as SimpleItemAnimator)
-                                .supportsChangeAnimations = false
-//                            profileAdapter.differ.submitList(listOfPost?.await())
-                        }
-
+                    //reversing list to sort post according to date (descending order)
+                    list = if (userPost.listOfPosts.size <= 1) {
+                        userPost.listOfPosts
+                    } else {
+                        userPost.listOfPosts.reversed() as ArrayList
                     }
+
+                    profileAdapter = ProfileAdapter(list, this@ProfileFragment)
+                    binding.recyclerViewForProfile.adapter = profileAdapter
+                    binding.recyclerViewForProfile.layoutManager = LinearLayoutManager(context)
+                    (binding.recyclerViewForProfile.itemAnimator as SimpleItemAnimator)
+                        .supportsChangeAnimations = false
+
+                    activity?.window?.setFlags(
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                    )
+                    listOfPost = GlobalScope.async(Dispatchers.IO) {
+                        val pList = loadPost(list)
+                        withContext(Dispatchers.Main) {
+                            activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                            binding.progressBarForProfile.visibility = View.GONE
+//                                profileAdapter.differ.submitList(pList)
+                        }
+                        return@async pList
+                    }
+
+//                    GlobalScope.launch(Dispatchers.Main) {
+//                        profileAdapter = ProfileAdapter(list, this@ProfileFragment)
+//                        binding.recyclerViewForProfile.adapter = profileAdapter
+//                        binding.recyclerViewForProfile.layoutManager = LinearLayoutManager(context)
+//                        (binding.recyclerViewForProfile.itemAnimator as SimpleItemAnimator)
+//                            .supportsChangeAnimations = false
+//                            profileAdapter.differ.submitList(listOfPost?.await())
+//                    }
                 }
             }
-            postDao = PostDao()
-        }catch (e: Exception){
+
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
@@ -115,12 +125,15 @@ class ProfileFragment : Fragment(), IProfileAdapter {
                 withContext(Dispatchers.Main) {
                     profileAdapter.differ.submitList(listOfPost.toMutableList())
                 }
-
                 Log.d(TAG, id)
             }
         }
         return listOfPost
     }
+
+//    private fun loadPost(){
+//        postDao.postCollection.d
+//    }
 
 //    private fun loadPost(list: ArrayList<String>): ArrayList<Post> {
 //        val pListOfPost = ArrayList<Post>()
@@ -142,10 +155,10 @@ class ProfileFragment : Fragment(), IProfileAdapter {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        try{
+        try {
             listOfIdJob?.cancel()
             listOfPost?.cancel()
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
         _binding = null
@@ -154,8 +167,6 @@ class ProfileFragment : Fragment(), IProfileAdapter {
     }
 
     override fun onPostLiked(post: Post, postId: String) {
-
-        if(binding.progressBarForProfile.visibility == View.VISIBLE) return
 
         val postCopy = post.copy(likedBy = post.likedBy.toMutableList() as ArrayList)
         val newList = runBlocking {
@@ -181,7 +192,7 @@ class ProfileFragment : Fragment(), IProfileAdapter {
 
     override fun onCommentButtonClicked(postId: String, createdBy: String) {
 
-        if(binding.progressBarForProfile.visibility == View.VISIBLE) return
+        if (binding.progressBarForProfile.visibility == View.VISIBLE) return
 
         val bundle = Bundle()
         bundle.putString("postId", postId)
@@ -205,7 +216,7 @@ class ProfileFragment : Fragment(), IProfileAdapter {
     @SuppressLint("SetTextI18n")
     override fun onDeletePostClicked(postId: String, position: Int) {
 
-        if(binding.progressBarForProfile.visibility == View.VISIBLE) return
+        if (binding.progressBarForProfile.visibility == View.VISIBLE) return
 
         val dialog = Constants.buildDialogBox(
             requireContext(),
@@ -224,19 +235,20 @@ class ProfileFragment : Fragment(), IProfileAdapter {
                     }
                     val delPost = updatedList.removeAt(position)
                     Log.d(TAG, "text:  ${delPost.postText}, size: ${updatedList.size} $updatedList")
-                    Log.d(TAG, list.toString())
+//                    Log.d(TAG, list.toString())
                     list.removeAt(position)
-                    GlobalScope.launch(Dispatchers.Main) {
-                        profileAdapter.differ.submitList(updatedList)
-                    }
-                    binding.numberOfPost.text = "${profileAdapter.itemCount}\nPosts"
-                    GlobalScope.launch(Dispatchers.IO){
+
+                    GlobalScope.launch(Dispatchers.IO) {
+                        Log.d(TAG, listOfPost?.await().toString())
                         val itm = listOfPost?.await()?.removeAt(position)
                         if (itm != null) {
                             Log.d(TAG, "item deleted from main list: ${itm.postText}")
                         }
                     }
 
+
+                    profileAdapter.differ.submitList(updatedList)
+                    binding.numberOfPost.text = "${updatedList.size}\nPosts"
 
                     Log.d(TAG, list.toString())
                     Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
@@ -253,7 +265,7 @@ class ProfileFragment : Fragment(), IProfileAdapter {
 
     override fun onShareClicked(text: String, userName: String) {
 
-        if(binding.progressBarForProfile.visibility == View.VISIBLE) return
+        if (binding.progressBarForProfile.visibility == View.VISIBLE) return
 
         val intent = Intent(Intent.ACTION_SEND).setType("text/plain")
         intent.putExtra(Intent.EXTRA_SUBJECT, "BuzzTalk")

@@ -26,7 +26,7 @@
         </service>
 
         <meta-data android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/icons8_b_100" />
+            android:resource="@drawable/icons8_b_100" android:value="@color/blue_1" />
 
         <activity
             android:name=".activity.CreatePostActivity"

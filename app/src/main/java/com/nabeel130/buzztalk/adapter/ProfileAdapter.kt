@@ -121,9 +121,8 @@ class ProfileAdapter(
             menu.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.deletePost -> {
-                        listener.onDeletePostClicked(listOfId[position], holder.adapterPosition)
-                        Log.d(TAG, "adapater position: ${holder.adapterPosition}, position: $position, ${listOfId[position]}")
-//                        listOfId.removeAt(position)
+                        listener.onDeletePostClicked(listOfId[position], position)
+                        Log.d(TAG, "adapter position: ${holder.adapterPosition}, position: $position, ${listOfId[position]}")
                         true
                     }
                     R.id.sharePost -> {
